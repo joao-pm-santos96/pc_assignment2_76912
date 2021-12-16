@@ -3,6 +3,8 @@ from croblink import *
 from math import *
 import xml.etree.ElementTree as ET
 
+import PID
+
 CELLROWS=7
 CELLCOLS=14
 
@@ -27,8 +29,37 @@ class MyRob(CRobLinkAngs):
         state = 'stop'
         stopped_state = 'run'
 
+        P = 0.2
+        I = 0.0
+        D = 0.0
+
+        # self.pid_r = PID.PID(P, I, D)
+        # self.pid_r.SetPoint=0.4
+        # self.pid_r.setSampleTime(0.1)        
+
+        # self.pid_l = PID.PID(P, I, D)
+        # self.pid_l.SetPoint=0.4
+        # self.pid_l.setSampleTime(0.1)   
+
+        self.pid = PID.PID(P, I, D)
+        self.pid.SetPoint = 0.0
+        self.pid.setSampleTime(0.1)                
+
         while True:
             self.readSensors()
+
+            # print(self.measures.irSensor)
+            # print(self.measures.ground)
+
+            dist_r = 1/self.measures.irSensor[2]
+            dist_l = 1/self.measures.irSensor[1]
+
+            self.pid.update(dist_r - dist_l)
+            
+
+            print(self.pid.output)
+
+
 
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
@@ -60,6 +91,8 @@ class MyRob(CRobLinkAngs):
                 if self.measures.returningLed==True:
                     self.setReturningLed(False)
                 self.wander()
+
+            
             
 
     def wander(self):
@@ -67,22 +100,27 @@ class MyRob(CRobLinkAngs):
         left_id = 1
         right_id = 2
         back_id = 3
-        if    self.measures.irSensor[center_id] > 5.0\
-           or self.measures.irSensor[left_id]   > 5.0\
-           or self.measures.irSensor[right_id]  > 5.0\
-           or self.measures.irSensor[back_id]   > 5.0:
-            print('Rotate left')
-            self.driveMotors(-0.1,+0.1)
-        elif self.measures.irSensor[left_id]> 2.7:
-            print('Rotate slowly right')
-            self.driveMotors(0.1,0.0)
-        elif self.measures.irSensor[right_id]> 2.7:
-            print('Rotate slowly left')
-            self.driveMotors(0.0,0.1)
-        else:
-            print('Go')
-            self.driveMotors(0.1,0.1)
 
+        self.driveMotors(0.1 - self.pid.output, 
+                         0.1 + self.pid.output)
+
+        # if    self.measures.irSensor[center_id] > 5.0\
+        #    or self.measures.irSensor[left_id]   > 5.0\
+        #    or self.measures.irSensor[right_id]  > 5.0\
+        #    or self.measures.irSensor[back_id]   > 5.0:
+        #     print('Rotate left')
+        #     self.driveMotors(-0.1,+0.1)
+        # elif self.measures.irSensor[left_id]> 2.7:
+        #     print('Rotate slowly right')
+        #     self.driveMotors(0.1,0.0)
+        # elif self.measures.irSensor[right_id]> 2.7:
+        #     print('Rotate slowly left')
+        #     self.driveMotors(0.0,0.1)
+        # else:
+        #     print('Go')
+        #     self.driveMotors(0.1,0.1)
+
+   
 class Map():
     def __init__(self, filename):
         tree = ET.parse(filename)
@@ -130,7 +168,7 @@ for i in range(1, len(sys.argv),2):
         quit()
 
 if __name__ == '__main__':
-    rob=MyRob(rob_name,pos,[0.0,60.0,-60.0,180.0],host)
+    rob=MyRob(rob_name,pos,[0.0,90.0,-90.0,180.0],host)
     if mapc != None:
         rob.setMap(mapc.labMap)
         rob.printMap()
