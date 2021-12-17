@@ -43,28 +43,31 @@ def fitness_func(solution, solution_idx):
     host = "localhost"
     pos = 1
 
-    # reset simulation
-    pyautogui.hotkey('ctrl', 'r')
+    # # reset simulation
+    # pyautogui.hotkey('ctrl', 'r')
 
-    # setup agent
-    angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
+    # # setup agent
+    # angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
     
-    rob=MyRob(rob_name, pos, angles, host, 
-    base_speed=solution[2], 
-    P=solution[3], 
-    I=solution[4], 
-    D=solution[5],
-    in_eval=True)
+    # rob=MyRob(rob_name, pos, angles, host, 
+    # base_speed=solution[2], 
+    # P=solution[3], 
+    # I=solution[4], 
+    # D=solution[5],
+    # in_eval=True)
     
-    rob.run()
+    # rob.run()
 
-    # start simulation
-    pyautogui.hotkey('ctrl', 's')
+    # # start simulation
+    # pyautogui.hotkey('ctrl', 's')
 
-    return 1/rob.time # todo is this the correct variable?
+    # return 1/rob.time # todo is this the correct variable?
+
+    return sum(solution)
 
 def on_generation(ga):
-    print("Generation", ga.generations_completed)
+    print(f'Generation: {ga.generations_completed}')
+    print(f'Best: {ga.best_solutions[-1]}')
     # print(ga.population)
 
 """
@@ -72,19 +75,17 @@ MAIN
 """
 if __name__ == '__main__':
 
-    delay = 10
+    delay = 1
+    num_genes = 6
+    num_generations = 200
+    sol_per_pop = 1000
+    num_parents_mating = 100
+
     print('Active the main simulation window!')
     print(f'Waiting for {delay} seconds...')
     time.sleep(delay)
     print('Starting!')
-    
-    num_genes = 6
 
-    num_generations = 2
-    sol_per_pop = 8
-    num_parents_mating = 4
-
-    # initial_population = [45, 90, 0.1, 0, 0, 0]
     gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
     gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
 
@@ -101,19 +102,20 @@ if __name__ == '__main__':
                        mutation_type="random",
                        mutation_percent_genes=10,
                        on_generation=on_generation,
-                       allow_duplicate_genes=False)
+                       allow_duplicate_genes=False,
+                       save_best_solutions=True)
 
     ga_instance.run()
-
-    time_string = datetime.now().isoformat()
-
-    ga_instance.save(filename=f'genetic_{time_string}')
 
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
     print("Parameters of the best solution : {solution}".format(solution=solution))
     print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
 
-    filename = f'results_{round(solution_fitness, 3)}_{time_string}.txt' 
+    name_append =f'{round(solution_fitness, 3)}_{datetime.now().strftime("%Y.%m.%d_%H.%M.%S")}'
+
+    ga_instance.save(filename=f'outputs/genetic_{name_append}')
+
+    filename = f'outputs/results_{name_append}.txt' 
     np.savetxt(filename, solution, delimiter=',')
 
     ga_instance.plot_fitness()
