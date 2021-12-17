@@ -3,14 +3,25 @@ from croblink import *
 from math import *
 import xml.etree.ElementTree as ET
 
+"""
+JS Imports
+"""
 import PID
 
 CELLROWS=7
 CELLCOLS=14
 
 class MyRob(CRobLinkAngs):
-    def __init__(self, rob_name, rob_id, angles, host):
+    def __init__(self, rob_name, rob_id, angles, host, base_speed = 0.1, P=0, I=0, D=0, in_eval= False):
         CRobLinkAngs.__init__(self, rob_name, rob_id, angles, host)
+
+        self.base_speed = base_speed
+        self.P = P
+        self.I = I
+        self.D = D
+        self.set_point = 0.0
+        self.sample_time = 0.1
+        self.in_eval = in_eval
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -27,39 +38,33 @@ class MyRob(CRobLinkAngs):
             quit()
 
         state = 'stop'
-        stopped_state = 'run'
+        stopped_state = 'run' 
 
-        P = 0.2
-        I = 0.0
-        D = 0.0
+        # initialize PID
+        self.pid = PID.PID(self.P, self.I, self.D)
+        self.pid.SetPoint = self.set_point
+        self.pid.setSampleTime(self.sample_time)
 
-        # self.pid_r = PID.PID(P, I, D)
-        # self.pid_r.SetPoint=0.4
-        # self.pid_r.setSampleTime(0.1)        
-
-        # self.pid_l = PID.PID(P, I, D)
-        # self.pid_l.SetPoint=0.4
-        # self.pid_l.setSampleTime(0.1)   
-
-        self.pid = PID.PID(P, I, D)
-        self.pid.SetPoint = 0.0
-        self.pid.setSampleTime(0.1)                
+        # localization
+        last_ground = -1
+        grounds = []
 
         while True:
             self.readSensors()
 
-            # print(self.measures.irSensor)
-            # print(self.measures.ground)
+            # evaluation stop conditions
+            stop_condition = self.in_eval and (self.measures.collision)
+            if stop_condition:
+                quit()
 
-            dist_r = 1/self.measures.irSensor[2]
-            dist_l = 1/self.measures.irSensor[1]
+            # localization
+            if (self.measures.ground != last_ground) and self.measures.ground != -1:
+                grounds.append(self.measures.ground)
+                self.measures.ground = last_ground
 
-            self.pid.update(dist_r - dist_l)
-            
-
-            print(self.pid.output)
-
-
+            # PID
+            delta = (self.measures.irSensor[0] - self.measures.irSensor[2]) + (self.measures.irSensor[1] - self.measures.irSensor[3])
+            self.pid.update(delta)
 
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
@@ -90,19 +95,17 @@ class MyRob(CRobLinkAngs):
                     self.setVisitingLed(False)
                 if self.measures.returningLed==True:
                     self.setReturningLed(False)
-                self.wander()
-
-            
+                self.wander()           
             
 
     def wander(self):
-        center_id = 0
-        left_id = 1
-        right_id = 2
-        back_id = 3
+        # center_id = 0
+        # left_id = 1
+        # right_id = 2
+        # back_id = 3
 
-        self.driveMotors(0.1 - self.pid.output, 
-                         0.1 + self.pid.output)
+        self.driveMotors(self.base_speed - self.pid.output, 
+                         self.base_speed + self.pid.output)
 
         # if    self.measures.irSensor[center_id] > 5.0\
         #    or self.measures.irSensor[left_id]   > 5.0\
@@ -168,7 +171,18 @@ for i in range(1, len(sys.argv),2):
         quit()
 
 if __name__ == '__main__':
-    rob=MyRob(rob_name,pos,[0.0,90.0,-90.0,180.0],host)
+    angles = [0.0, 90.0, -90.0, 180.0]
+    base_speed = 0.1
+    P = 0
+    I = 0
+    D = 0
+
+    rob=MyRob(rob_name, pos, angles, host, 
+        base_speed=base_speed,
+        P=P,
+        I=I,
+        D=D)
+
     if mapc != None:
         rob.setMap(mapc.labMap)
         rob.printMap()
