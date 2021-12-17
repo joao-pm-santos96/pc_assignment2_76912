@@ -10,8 +10,8 @@ from mainRob import MyRob
 
 import pygad
 import pyautogui
-import json
 import time
+import numpy as np
 
 """
 METADATA
@@ -46,21 +46,22 @@ def fitness_func(solution, solution_idx):
     pyautogui.hotkey('ctrl', 'r')
 
     # setup agent
-    angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
+    # angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
     
-    rob=MyRob(rob_name, pos, angles, host, 
-    base_speed=solution[2], 
-    P=solution[3], 
-    I=solution[4], 
-    D=solution[5],
-    in_eval=True)
+    # rob=MyRob(rob_name, pos, angles, host, 
+    # base_speed=solution[2], 
+    # P=solution[3], 
+    # I=solution[4], 
+    # D=solution[5],
+    # in_eval=True)
+
     
-    rob.run()
+    # rob.run()
 
     # start simulation
     pyautogui.hotkey('ctrl', 's')
 
-    return ?
+    return sum(solution)
 
 def on_generation(ga):
     print("Generation", ga.generations_completed)
@@ -70,18 +71,28 @@ def on_generation(ga):
 MAIN
 """
 if __name__ == '__main__':
+
+    delay = 1
+    print('Active the main simulation window!')
+    print(f'Waiting for {delay} seconds...')
+    time.sleep(delay)
+    print('Starting!')
     
-    num_generations = 50
+    num_genes = 6
+
+    num_generations = 2
+    sol_per_pop = 8
     num_parents_mating = 4
 
-    initial_population = [45, 90, 0.1, 0, 0, 0]
-    gene_space = [range(0, 90), range(90, 181), None, None, None, None] 
-    gene_type = [int, int, [float, 3]*4]
+    # initial_population = [45, 90, 0.1, 0, 0, 0]
+    gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
+    gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
 
     ga_instance = pygad.GA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
                        fitness_func=fitness_func,
-                       initial_population=initial_population,
+                       sol_per_pop=sol_per_pop,
+                       num_genes=num_genes,
                        gene_type=gene_type,
                        gene_space=gene_space,                       
                        parent_selection_type="sss",
@@ -100,12 +111,8 @@ if __name__ == '__main__':
     print("Parameters of the best solution : {solution}".format(solution=solution))
     print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
 
-    data = {'solution': solution,
-        'fitness': solution_fitness,
-        'index': solution_idx}
-
-    with open(f'results_{solution_fitness}_{time.time()}.txt', 'w') as outfile:
-        json.dump(data, outfile)
+    filename = f'results_{round(solution_fitness, 3)}_{time.time()}.txt' 
+    np.savetxt(filename, solution, delimiter=',')
 
     ga_instance.plot_fitness()
 
