@@ -52,15 +52,23 @@ class MyRob(CRobLinkAngs):
         while True:
             self.readSensors()
 
-            # evaluation stop conditions
-            stop_condition = self.in_eval and (self.measures.collision)
-            if stop_condition:
-                quit()
-
             # localization
             if (self.measures.ground != last_ground) and self.measures.ground != -1:
                 grounds.append(self.measures.ground)
+                print(grounds)
                 self.measures.ground = last_ground
+
+            # evaluation stop conditions
+            finish_condition = self.in_eval and self.checkLapCompleted(grounds[-4:])
+            if finish_condition:
+                print('Finish condition')
+                quit()
+
+            error_condition = self.in_eval and (self.measures.collision or self.measures.time > 5000 or not self.checkTravelDir(grounds[-2:]))            
+            if error_condition:
+                self.measures.time = float('inf')
+                print('Error condition')
+                quit()
 
             # PID
             delta = (self.measures.irSensor[0] - self.measures.irSensor[2]) + (self.measures.irSensor[1] - self.measures.irSensor[3])
@@ -123,6 +131,14 @@ class MyRob(CRobLinkAngs):
         #     print('Go')
         #     self.driveMotors(0.1,0.1)
 
+    """
+    JS METHODS
+    """
+    def checkTravelDir(self, last_two):
+        return tuple(last_two) in [(0,1), (1,2), (2,0)] if len(last_two) > 1 else True
+
+    def checkLapCompleted(self, last_four):
+        return tuple(last_four) == (0, 1, 2, 0) if len(last_four) == 4 else False
    
 class Map():
     def __init__(self, filename):
