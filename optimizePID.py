@@ -79,7 +79,7 @@ if __name__ == '__main__':
     num_genes = 6
     num_generations = 200
     sol_per_pop = 1000
-    num_parents_mating = 100
+    num_parents_mating = int(sol_per_pop * 0.1)
 
     print('Active the main simulation window!')
     print(f'Waiting for {delay} seconds...')
@@ -96,11 +96,13 @@ if __name__ == '__main__':
                        num_genes=num_genes,
                        gene_type=gene_type,
                        gene_space=gene_space,                       
-                       parent_selection_type="sss",
+                       parent_selection_type="sus",
                        keep_parents=1,
                        crossover_type="single_point",
                        mutation_type="random",
                        mutation_percent_genes=10,
+                       random_mutation_min_val = -5.0,
+                       random_mutation_max_val = 5.0,
                        on_generation=on_generation,
                        allow_duplicate_genes=False,
                        save_best_solutions=True)
@@ -118,7 +120,7 @@ if __name__ == '__main__':
     filename = f'outputs/results_{name_append}.txt' 
     np.savetxt(filename, solution, delimiter=',')
 
-    ga_instance.plot_fitness()
-
+    ga_instance.plot_fitness(save_dir=f'outputs/graph_{name_append}.png')
+    
 
     
