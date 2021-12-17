@@ -57,17 +57,23 @@ class MyRob(CRobLinkAngs):
                 grounds.append(self.measures.ground)
                 print(grounds)
                 self.measures.ground = last_ground
+            
+            # stop conditions
 
-            # evaluation stop conditions
-            finish_condition = self.in_eval and self.checkLapCompleted(grounds[-4:])
-            if finish_condition:
-                print('Finish condition')
+            # reached end
+            if self.in_eval and self.checkLapCompleted(grounds[-4:]):
+                print('Reached end')
                 quit()
 
-            error_condition = self.in_eval and (self.measures.collision or self.measures.time > 5000 or not self.checkTravelDir(grounds[-2:]))            
-            if error_condition:
-                self.measures.time = float('inf')
-                print('Error condition')
+            # collision
+            if self.in_eval and self.measures.collision:
+                print('Collided')
+                # TODO penalty?
+                quit()
+
+            # taking too long
+            if self.in_eval and self.measures.time > 5000:
+                print('Took too long')
                 quit()
 
             # PID

@@ -43,31 +43,36 @@ def fitness_func(solution, solution_idx):
     host = "localhost"
     pos = 1
 
-    # # reset simulation
-    # pyautogui.hotkey('ctrl', 'r')
+    # reset simulation
+    pyautogui.hotkey('ctrl', 'r')
 
-    # # setup agent
-    # angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
+    # setup agent
+    angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
     
-    # rob=MyRob(rob_name, pos, angles, host, 
-    # base_speed=solution[2], 
-    # P=solution[3], 
-    # I=solution[4], 
-    # D=solution[5],
-    # in_eval=True)
+    rob=MyRob(rob_name, pos, angles, host, 
+    base_speed=solution[2], 
+    P=solution[3], 
+    I=solution[4], 
+    D=solution[5],
+    in_eval=True)
     
-    # rob.run()
+    rob.run()
 
-    # # start simulation
-    # pyautogui.hotkey('ctrl', 's')
+    # start simulation
+    pyautogui.hotkey('ctrl', 's')
 
-    # return 1/rob.time # todo is this the correct variable?
+    # normalization values
 
-    return sum(solution)
+    a = 600.0
+    b = 400.0
+    return (1/(rob.time / a) + rob.score / b) * 100.0
+
 
 def on_generation(ga):
     print(f'Generation: {ga.generations_completed}')
-    print(f'Best: {ga.best_solutions[-1]}')
+    print(f'Best solution: {ga.best_solutions[-1]}')
+    print(f'Best fitness: {ga.best_solutions_fitness[-1]}')
+
     # print(ga.population)
 
 """
