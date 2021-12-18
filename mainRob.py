@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 from croblink import *
 from math import *
@@ -7,6 +8,7 @@ import xml.etree.ElementTree as ET
 JS Imports
 """
 import PID
+import numpy as np
 
 CELLROWS=7
 CELLCOLS=14
@@ -20,7 +22,7 @@ class MyRob(CRobLinkAngs):
         self.I = I
         self.D = D
         self.set_point = 0.0
-        self.sample_time = 0.1
+        self.sample_time = 0.1 # seconds
         self.in_eval = in_eval
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
@@ -55,29 +57,28 @@ class MyRob(CRobLinkAngs):
             # localization
             if (self.measures.ground != last_ground) and self.measures.ground != -1:
                 grounds.append(self.measures.ground)
-                print(grounds)
-                self.measures.ground = last_ground
+                last_ground = self.measures.ground
             
             # stop conditions
 
             # reached end
             if self.in_eval and self.checkLapCompleted(grounds[-4:]):
-                print('Reached end')
-                quit()
+                # print('Reached end')
+                return
 
             # collision
             if self.in_eval and self.measures.collision:
-                print('Collided')
-                # TODO penalty?
-                quit()
+                # print('Collided')
+                self.measures.time = float('inf')
+                return
 
             # taking too long
-            if self.in_eval and self.measures.time > 5000:
-                print('Took too long')
-                quit()
+            if self.in_eval and self.measures.time > 1000:
+                # print('Took too long')
+                return
 
             # PID
-            delta = (self.measures.irSensor[0] - self.measures.irSensor[2]) + (self.measures.irSensor[1] - self.measures.irSensor[3])
+            delta = (self.measures.irSensor[1] - self.measures.irSensor[3]) # TODO add others
             self.pid.update(delta)
 
             if self.measures.endLed:
@@ -118,8 +119,12 @@ class MyRob(CRobLinkAngs):
         # right_id = 2
         # back_id = 3
 
-        self.driveMotors(self.base_speed - self.pid.output, 
-                         self.base_speed + self.pid.output)
+        coefficients = np.array([[1, 1], [1, -1]])
+        results = np.array([2 * self.base_speed, self.pid.output])
+        v_right, v_left = np.linalg.solve(coefficients, results)
+
+        self.driveMotors(v_left, v_right)
+
 
         # if    self.measures.irSensor[center_id] > 5.0\
         #    or self.measures.irSensor[left_id]   > 5.0\
@@ -193,11 +198,20 @@ for i in range(1, len(sys.argv),2):
         quit()
 
 if __name__ == '__main__':
-    angles = [0.0, 90.0, -90.0, 180.0]
+
+    # angles = [0.0, 90.0, -90.0, 180.0]
+    angles = [45.0, 90.0, -45.0, -90.0]
     base_speed = 0.1
-    P = 0
-    I = 0
+    P = 0.2
+    I = 0.2
     D = 0
+
+    # solution = [55, 173, 2.15, 56.988, 43.866, 49.003]
+    # angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
+    # base_speed = solution[2]
+    # P = solution[3]
+    # I = solution[4]
+    # D = solution[5]
 
     rob=MyRob(rob_name, pos, angles, host, 
         base_speed=base_speed,

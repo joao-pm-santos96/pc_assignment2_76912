@@ -34,6 +34,7 @@ TODO
 CLASS DEFINITIONS
 """
 
+
 """
 FUNCTIONS DEFINITIONS
 """
@@ -43,29 +44,45 @@ def fitness_func(solution, solution_idx):
     host = "localhost"
     pos = 1
 
+    print(f'Individual {solution_idx}: {solution}')
+
+    explorer = {'x':1415, 'y':845}
+    viewer = {'x':1415, 'y':200}
+
     # reset simulation
+    pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
     pyautogui.hotkey('ctrl', 'r')
 
     # setup agent
-    angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
+    # angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
+    angles = [45, 90, -45, -90]
     
     rob=MyRob(rob_name, pos, angles, host, 
-    base_speed=solution[2], 
-    P=solution[3], 
-    I=solution[4], 
-    D=solution[5],
+    base_speed=0.1, 
+    P=solution[0], 
+    I=solution[1], 
+    D=solution[2],
     in_eval=True)
-    
-    rob.run()
+
+    # connect viewer
+    pyautogui.click(x=viewer['x'], y=viewer['y'], clicks=1, button='left')
+    pyautogui.hotkey('ctrl', 'c')
 
     # start simulation
+    pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
     pyautogui.hotkey('ctrl', 's')
+
+    rob.run()
 
     # normalization values
 
     a = 600.0
     b = 400.0
-    return (1/(rob.time / a) + rob.score / b) * 100.0
+    # print(f'Time: {rob.measures.time}')
+    # print(f'Score: {rob.measures.score}')
+
+    # return (1/(rob.measures.time / a) + rob.measures.score / b) * 100.0
+    return rob.measures.score
 
 
 def on_generation(ga):
@@ -80,19 +97,25 @@ MAIN
 """
 if __name__ == '__main__':
 
-    delay = 1
-    num_genes = 6
-    num_generations = 200
-    sol_per_pop = 1000
+
+    # num_genes = 6
+
+    # num_generations = 1000
+    # sol_per_pop = 25
+    # num_parents_mating = int(sol_per_pop * 0.1)
+
+    # gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
+    # gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
+
+
+    num_genes = 3
+
+    num_generations = 100
+    sol_per_pop = 25
     num_parents_mating = int(sol_per_pop * 0.1)
 
-    print('Active the main simulation window!')
-    print(f'Waiting for {delay} seconds...')
-    time.sleep(delay)
-    print('Starting!')
-
-    gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
-    gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
+    gene_space = None
+    gene_type = [float, 3]
 
     ga_instance = pygad.GA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -106,8 +129,8 @@ if __name__ == '__main__':
                        crossover_type="single_point",
                        mutation_type="random",
                        mutation_percent_genes=10,
-                       random_mutation_min_val = -5.0,
-                       random_mutation_max_val = 5.0,
+                       random_mutation_min_val = -1.0,
+                       random_mutation_max_val = 1.0,
                        on_generation=on_generation,
                        allow_duplicate_genes=False,
                        save_best_solutions=True)
