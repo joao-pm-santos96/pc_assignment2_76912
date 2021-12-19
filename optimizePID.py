@@ -93,7 +93,7 @@ class PooledGA(pygad.GA):
 
     def cal_pop_fitness(self):
 
-        t = Timer(0.2, PooledGA.start_sim)
+        t = Timer(0.1, PooledGA.start_sim)
         t.start()
         
         with Pool(processes=self.sol_per_pop) as pool:
@@ -213,12 +213,15 @@ if __name__ == '__main__':
 
     num_genes = 3
 
-    num_generations = 200
-    sol_per_pop = 20
-    num_parents_mating = int(sol_per_pop * 0.1) if sol_per_pop >= 10 else 1
+    num_generations = 1000
+    sol_per_pop = 25
+    num_parents_mating = int(sol_per_pop * 0.5) if sol_per_pop >= 10 else 1
 
     gene_space = None
     gene_type = [float, 3]
+
+    gene_init_val = 1.0
+    random_mutation_val = 0.25
 
     instance = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -232,10 +235,10 @@ if __name__ == '__main__':
                        crossover_type="single_point",
                        mutation_type="random",
                        mutation_percent_genes=10,
-                       init_range_high=1,
-                       init_range_low=-1, 
-                       random_mutation_min_val = -1.0,
-                       random_mutation_max_val = 1.0,
+                       init_range_high=gene_init_val,
+                       init_range_low=-gene_init_val, 
+                       random_mutation_min_val = -random_mutation_val,
+                       random_mutation_max_val = random_mutation_val,
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness,  
                        allow_duplicate_genes=True,
