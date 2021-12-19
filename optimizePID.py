@@ -147,8 +147,7 @@ if __name__ == '__main__':
 
     num_generations = 1000
     sol_per_pop = 50
-    num_parents_mating = int(sol_per_pop * 0.5) 
-    num_parents_mating = num_parents_mating if num_parents_mating > 0 else 1
+    num_parents_mating = 15
 
     gene_space = [{'low': 0,'high': 90}, None, None, None, None]
     gene_type = [int, float, float, float, float]
@@ -158,22 +157,22 @@ if __name__ == '__main__':
 
     instance = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
-                       fitness_func=PooledGA.fitness_func,
                        sol_per_pop=sol_per_pop,
                        num_genes=num_genes,
                        gene_type=gene_type,
                        gene_space=gene_space,
-                       parent_selection_type="sus",
-                       keep_parents=-1,
-                       crossover_type="uniform",
-                       mutation_type="random",
-                       mutation_probability=0.05,
                        init_range_high=gene_init_val,
                        init_range_low=-gene_init_val, 
                        random_mutation_min_val = -random_mutation_val,
                        random_mutation_max_val = random_mutation_val,
+                       fitness_func=PooledGA.fitness_func,
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness,  
+                       mutation_probability=0.15,
+                       parent_selection_type="sss",
+                       keep_parents=-1,
+                       crossover_type="uniform",
+                       mutation_type="random",
                        allow_duplicate_genes=True,
                        save_best_solutions=False)
 
