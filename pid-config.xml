@@ -1,4 +1,4 @@
-<Parameters SimTime="0" CycleTime="0"
+<Parameters SimTime="0" CycleTime="50"
 		CompassNoise="0" BeaconNoise="0" ObstacleNoise="0"
 		MotorsNoise="0" KeyTime="5000"
 		GPS="On" GPSLinNoise="0" GPSDirNoise="0" 

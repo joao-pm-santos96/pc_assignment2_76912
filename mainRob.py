@@ -25,7 +25,7 @@ class MyRob(CRobLinkAngs):
         self.I = I
         self.D = D
         self.set_point = 0.0
-        self.sample_time = 25e-3 # seconds
+        self.sample_time = 1e-3 # seconds
         self.in_eval = in_eval
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
@@ -80,9 +80,9 @@ class MyRob(CRobLinkAngs):
             #     return
 
             # collision
-            # if self.in_eval and self.measures.collision:
-            #     # self.measures.time = float('inf')
-            #     return
+            if self.in_eval and self.measures.collision:
+                # self.measures.time = float('inf')
+                return
 
             # taking too long
             if self.in_eval and self.measures.time > 500:
@@ -90,8 +90,8 @@ class MyRob(CRobLinkAngs):
                 return
 
             # PID
-            delta1 = (1/self.measures.irSensor[0] - 1/self.measures.irSensor[2]) # TODO add others
-            delta2 = (1/self.measures.irSensor[1] - 1/self.measures.irSensor[3]) # TODO add others
+            delta1 = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[0]) # TODO add others
+            delta2 = (1/self.measures.irSensor[3] - 1/self.measures.irSensor[1]) # TODO add others
             self.pid.update(delta1 + delta2)
 
             if self.measures.endLed:
@@ -213,11 +213,17 @@ for i in range(1, len(sys.argv),2):
 if __name__ == '__main__':
 
     # angles = [0.0, 90.0, -90.0, 180.0]
-    # angles = [45.0, 90.0, -45.0, -90.0]
+    angles = [30.0, 90.0, -30.0, -90.0]
 
     
     P, I, D, base_speed = [ 0.85683389,  1.24787223, -0.00584253,  0.24132753]
-    angles = [0.0, 45.0, -45.0, 180.0] # works best!!
+
+
+
+
+
+    P, I, D, base_speed = [0.25,0,0,0.1]
+    # angles = [0.0, 45.0, -45.0, 180.0] # works best!!
 
     rob=MyRob(rob_name, pos, angles, host, 
         base_speed=base_speed,
@@ -229,7 +235,6 @@ if __name__ == '__main__':
         rob.setMap(mapc.labMap)
         rob.printMap()
     
-   
     rob.run()
 
 

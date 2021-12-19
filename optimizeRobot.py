@@ -44,13 +44,13 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        angles = [90.0, solution[0], -90.0, -solution[0]]
+        angles = [30.0, 90.0, -30.0, -90.0]
 
         rob=MyRob(rob_name, pos, angles, host, 
-            base_speed=solution[1], 
-            P=solution[2], 
-            I=solution[3], 
-            D=solution[4],
+            base_speed=solution[0], 
+            P=solution[1], 
+            I=solution[2], 
+            D=solution[3],
             in_eval=True)
         
         rob.run()
@@ -105,7 +105,7 @@ class PooledGA(pygad.GA):
 
     def cal_pop_fitness(self):
 
-        t = Timer(0.1, PooledGA.start_sim)
+        t = Timer(0.2, PooledGA.start_sim)
         t.start()
         
         with Pool(processes=self.sol_per_pop) as pool:
@@ -142,19 +142,22 @@ if __name__ == '__main__':
     # gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
     # gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
 
-    num_genes = 5
-
+    num_genes = 4
     num_generations = 1000
-    sol_per_pop = 100
-    num_parents_mating = 75
+    sol_per_pop = 50
+    num_parents_mating = 20
 
-    gene_space = [{'low': 0,'high': 46}, None, None, None, None]
-    gene_type = [int, float, float, float, float]
+    gene_space = [None] * num_genes
+    gene_space[0] = [0.1]
+
+    gene_type = [float, 5]
 
     gene_init_val = 1.0
-    random_mutation_val = 5.0
+    random_mutation_val = 0.5
 
-    instance = PooledGA(num_generations=num_generations,
+    pyautogui.PAUSE = 0.2
+
+    ga = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
                        sol_per_pop=sol_per_pop,
                        num_genes=num_genes,
@@ -167,14 +170,13 @@ if __name__ == '__main__':
                        fitness_func=PooledGA.fitness_func,
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness,  
-                       mutation_probability=0.1,
+                       mutation_probability=0.15,
                        parent_selection_type="tournament",
-                       K_tournament = num_parents_mating,
-                       keep_parents=-1,
+                       K_tournament = 3,
                        crossover_type="uniform",
                        mutation_type="random",
                        allow_duplicate_genes=True,
                        save_best_solutions=False)
 
 
-    instance.compute()
+    ga.compute()
