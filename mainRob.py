@@ -57,10 +57,6 @@ class MyRob(CRobLinkAngs):
         last_pos = None
         self.distance = 0
 
-
-        self.temp = []
-        self.pids = []
-
         while True:
             self.readSensors()
 
@@ -85,7 +81,7 @@ class MyRob(CRobLinkAngs):
 
             # collision
             if self.in_eval and self.measures.collision:
-                self.measures.time = float('inf')
+                # self.measures.time = float('inf')
                 return
 
             # taking too long
@@ -96,13 +92,6 @@ class MyRob(CRobLinkAngs):
             # PID
             delta = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[1]) # TODO add others
             self.pid.update(delta)
-
-            ################################################################
-            self.temp.append(self.measures.irSensor)
-            self.pids.append(self.pid.output)
-            if self.measures.collision:
-                return
-            ################################################################
 
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
@@ -227,9 +216,7 @@ if __name__ == '__main__':
 
     angles = [0.0, 45.0, -45.0, 180.0] # works best!!
     base_speed = 0.1
-    P = 0
-    I = 0
-    D = 0
+    P, I, D = [0.199, 1.096, 0.003]
 
     rob=MyRob(rob_name, pos, angles, host, 
         base_speed=base_speed,
@@ -245,18 +232,3 @@ if __name__ == '__main__':
     rob.run()
 
 
-
-
-
-    
-
-    # plt.plot(np.divide(1,rob.temp))
-
-    # plt.plot(rob.pids)
-    
-    # leg = [str(x) for x in angles]
-    # leg.append('pid')
-
-    # plt.legend(leg)
-
-    # plt.show()
