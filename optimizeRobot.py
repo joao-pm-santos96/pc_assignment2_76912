@@ -55,7 +55,7 @@ class PooledGA(pygad.GA):
         
         rob.run()
 
-        return (rob.measures.score / 10) * (rob.distance / 2.0)
+        return rob.measures.score
 
     @staticmethod
     def fitness_wrapper(idx, solution):
@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
     num_generations = 1000
     sol_per_pop = 50
-    num_parents_mating = 15
+    num_parents_mating = 16
 
     gene_space = [{'low': 0,'high': 90}, None, None, None, None]
     gene_type = [int, float, float, float, float]
@@ -169,7 +169,7 @@ if __name__ == '__main__':
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness,  
                        mutation_probability=0.15,
-                       parent_selection_type="sss",
+                       parent_selection_type="sus",
                        keep_parents=-1,
                        crossover_type="uniform",
                        mutation_type="random",

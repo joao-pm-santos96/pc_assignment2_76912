@@ -76,13 +76,13 @@ class MyRob(CRobLinkAngs):
             # stop conditions
 
             # reached end
-            if self.in_eval and self.checkLapCompleted(grounds[-4:]):
-                return
+            # if self.in_eval and self.checkLapCompleted(grounds[-4:]):
+            #     return
 
             # collision
-            if self.in_eval and self.measures.collision:
-                # self.measures.time = float('inf')
-                return
+            # if self.in_eval and self.measures.collision:
+            #     # self.measures.time = float('inf')
+            #     return
 
             # taking too long
             if self.in_eval and self.measures.time > 500:
