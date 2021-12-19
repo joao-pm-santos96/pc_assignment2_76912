@@ -91,7 +91,7 @@ class MyRob(CRobLinkAngs):
 
             # PID
             delta1 = (1/self.measures.irSensor[0] - 1/self.measures.irSensor[2]) # TODO add others
-            delta2 = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[3]) # TODO add others
+            delta2 = (1/self.measures.irSensor[1] - 1/self.measures.irSensor[3]) # TODO add others
             self.pid.update(delta1 + delta2)
 
             if self.measures.endLed:
