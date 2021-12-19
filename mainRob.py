@@ -22,7 +22,7 @@ class MyRob(CRobLinkAngs):
         self.I = I
         self.D = D
         self.set_point = 0.0
-        self.sample_time = 0.1 # seconds
+        self.sample_time = 25e-3 # seconds
         self.in_eval = in_eval
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
@@ -51,8 +51,19 @@ class MyRob(CRobLinkAngs):
         last_ground = -1
         grounds = []
 
+        last_pos = None
+        self.distance = 0
+
         while True:
             self.readSensors()
+
+            if self.in_eval and last_pos is not None:
+                pos = (self.measures.x, self.measures.y)
+                self.distance += np.linalg.norm(np.array(pos) - np.array(last_pos))
+                last_pos = pos
+
+            if self.in_eval and last_pos is None:
+                last_pos = (self.measures.x, self.measures.y)
 
             # localization
             if (self.measures.ground != last_ground) and self.measures.ground != -1:
@@ -73,12 +84,12 @@ class MyRob(CRobLinkAngs):
                 return
 
             # taking too long
-            if self.in_eval and self.measures.time > 1000:
+            if self.in_eval and self.measures.time > 500:
                 # print('Took too long')
                 return
 
             # PID
-            delta = (self.measures.irSensor[1] - self.measures.irSensor[3]) # TODO add others
+            delta = (1/self.measures.irSensor[1] - 1/self.measures.irSensor[3]) # TODO add others
             self.pid.update(delta)
 
             if self.measures.endLed:
@@ -202,9 +213,9 @@ if __name__ == '__main__':
     # angles = [0.0, 90.0, -90.0, 180.0]
     angles = [45.0, 90.0, -45.0, -90.0]
     base_speed = 0.1
-    P = 0.2
-    I = 0.2
-    D = 0
+    P = 5.087
+    I = -11.748
+    D = -1.017
 
     # solution = [55, 173, 2.15, 56.988, 43.866, 49.003]
     # angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
@@ -223,4 +234,7 @@ if __name__ == '__main__':
         rob.setMap(mapc.labMap)
         rob.printMap()
     
+    # msg = "<Start/>"
+    # rob.sock.sendto(msg.encode(), (rob.host, UDP_PORT))
+
     rob.run()

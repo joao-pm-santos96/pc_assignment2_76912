@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ARGS="--param pid-config.xml"
+ARGS+=" --lab ./ciberRatoTools/Labs/rmi-2122/C1-lab.xml"
+ARGS+=" --grid ./pid-grid.xml"
+ARGS+=" --scoring 1"
+
+(./simulator $ARGS) 
+
+echo Bye
