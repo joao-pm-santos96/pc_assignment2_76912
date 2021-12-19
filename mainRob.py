@@ -90,8 +90,9 @@ class MyRob(CRobLinkAngs):
                 return
 
             # PID
-            delta = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[1]) # TODO add others
-            self.pid.update(delta)
+            delta1 = (1/self.measures.irSensor[0] - 1/self.measures.irSensor[2]) # TODO add others
+            delta2 = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[3]) # TODO add others
+            self.pid.update(delta1 + delta2)
 
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
@@ -215,7 +216,7 @@ if __name__ == '__main__':
     # angles = [45.0, 90.0, -45.0, -90.0]
 
     
-    P, I, D, base_speed = [ 2.23071672,  1.16356351, -0.01969641,  0.4289186 ]
+    P, I, D, base_speed = [ 0.85683389,  1.24787223, -0.00584253,  0.24132753]
     angles = [0.0, 45.0, -45.0, 180.0] # works best!!
 
     rob=MyRob(rob_name, pos, angles, host, 

@@ -44,13 +44,13 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        angles = [0.0, 45.0, -45.0, 180.0]
+        angles = [90.0, solution[0], -90.0, -solution[0]]
 
         rob=MyRob(rob_name, pos, angles, host, 
-            base_speed=solution[3], 
-            P=solution[0], 
-            I=solution[1], 
-            D=solution[2],
+            base_speed=solution[1], 
+            P=solution[2], 
+            I=solution[3], 
+            D=solution[4],
             in_eval=True)
         
         rob.run()
@@ -89,9 +89,16 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def on_generation(ga):
-        print(f'Generation: {ga.generations_completed}')
-        print(f'Best solution: {ga.best_solutions[-1]}')
-        print(f'Best fitness: {ga.best_solutions_fitness[-1]}')
+        max_fitness = np.amax(ga.last_generation_fitness)
+        max_index = np.argmax(ga.last_generation_fitness)
+
+        print(f'Generation: {ga.generations_completed} of {ga.num_generations}')
+        # print(f'Best solution: {ga.best_solutions[-1]}')
+        # print(f'Best fitness: {ga.best_solutions_fitness[-1]}')
+
+        print(f'Best fitness: {max_fitness}')
+        print(f'Best solution: {ga.population[max_index]}')
+        print()
         
     @staticmethod
     def on_start(ga):
@@ -136,18 +143,18 @@ if __name__ == '__main__':
     # gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
     # gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
 
-    num_genes = 4
+    num_genes = 5
 
     num_generations = 1000
     sol_per_pop = 50
-    num_parents_mating = int(sol_per_pop * 0.15) 
+    num_parents_mating = int(sol_per_pop * 0.5) 
     num_parents_mating = num_parents_mating if num_parents_mating > 0 else 1
 
-    gene_space = None
-    gene_type = float
+    gene_space = [{'low': 0,'high': 90}, None, None, None, None]
+    gene_type = [int, float, float, float, float]
 
     gene_init_val = 1.0
-    random_mutation_val = 0.5
+    random_mutation_val = 1.0
 
     instance = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -168,7 +175,7 @@ if __name__ == '__main__':
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness,  
                        allow_duplicate_genes=True,
-                       save_best_solutions=True)
+                       save_best_solutions=False)
 
 
     instance.compute()
