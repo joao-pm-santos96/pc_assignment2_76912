@@ -63,11 +63,13 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def start_sim():
-        # explorer = {'x':500, 'y':845}
 
-        # # start simulation
-        # pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
-        # pyautogui.hotkey('ctrl', 's')
+        conn_view = True
+        if conn_view:
+            pos = pyautogui.locateCenterOnScreen('connect.png', region=(10,580,45,45))
+
+            if pos is not None:
+                pyautogui.click(pos[0],pos[1])
         
         pos = None
         while pos is None:
@@ -77,7 +79,7 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def reset_sim():
-        explorer = {'x':500, 'y':845}
+        explorer = {'x':430, 'y':300}
 
         # reset simulation
         pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
@@ -93,9 +95,6 @@ class PooledGA(pygad.GA):
         max_index = np.argmax(ga.last_generation_fitness)
 
         print(f'Generation: {ga.generations_completed} of {ga.num_generations}')
-        # print(f'Best solution: {ga.best_solutions[-1]}')
-        # print(f'Best fitness: {ga.best_solutions_fitness[-1]}')
-
         print(f'Best fitness: {max_fitness}')
         print(f'Best solution: {ga.population[max_index]}')
         print()
@@ -106,7 +105,7 @@ class PooledGA(pygad.GA):
 
     def cal_pop_fitness(self):
 
-        t = Timer(0.25, PooledGA.start_sim)
+        t = Timer(0.1, PooledGA.start_sim)
         t.start()
         
         with Pool(processes=self.sol_per_pop) as pool:
@@ -146,14 +145,14 @@ if __name__ == '__main__':
     num_genes = 5
 
     num_generations = 1000
-    sol_per_pop = 50
-    num_parents_mating = 16
+    sol_per_pop = 100
+    num_parents_mating = 75
 
-    gene_space = [{'low': 0,'high': 90}, None, None, None, None]
+    gene_space = [{'low': 0,'high': 46}, None, None, None, None]
     gene_type = [int, float, float, float, float]
 
     gene_init_val = 1.0
-    random_mutation_val = 1.0
+    random_mutation_val = 5.0
 
     instance = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -168,8 +167,9 @@ if __name__ == '__main__':
                        fitness_func=PooledGA.fitness_func,
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness,  
-                       mutation_probability=0.15,
-                       parent_selection_type="sus",
+                       mutation_probability=0.1,
+                       parent_selection_type="tournament",
+                       K_tournament = num_parents_mating,
                        keep_parents=-1,
                        crossover_type="uniform",
                        mutation_type="random",
