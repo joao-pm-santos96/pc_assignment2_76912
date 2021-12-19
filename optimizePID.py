@@ -44,7 +44,7 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        angles = [45, 90, -45, -90]
+        angles = [0.0, 45.0, -45.0, 180.0]
 
         rob=MyRob(rob_name, pos, angles, host, 
             base_speed=0.1, 
@@ -63,7 +63,7 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def start_sim():
-        explorer = {'x':1415, 'y':845}
+        explorer = {'x':200, 'y':845}
 
         # start simulation
         pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
@@ -71,7 +71,7 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def reset_sim():
-        explorer = {'x':1415, 'y':845}
+        explorer = {'x':200, 'y':845}
 
         # reset simulation
         pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
@@ -93,10 +93,10 @@ class PooledGA(pygad.GA):
 
     def cal_pop_fitness(self):
 
-        t = Timer(1, PooledGA.start_sim)
+        t = Timer(0.2, PooledGA.start_sim)
         t.start()
         
-        with Pool() as pool:
+        with Pool(processes=self.sol_per_pop) as pool:
             pop_fitness = pool.starmap(PooledGA.fitness_wrapper, list(enumerate(self.population)))   
 
         return np.array(pop_fitness)
@@ -213,8 +213,8 @@ if __name__ == '__main__':
 
     num_genes = 3
 
-    num_generations = 2000
-    sol_per_pop = 8
+    num_generations = 200
+    sol_per_pop = 20
     num_parents_mating = int(sol_per_pop * 0.1) if sol_per_pop >= 10 else 1
 
     gene_space = None
@@ -232,8 +232,8 @@ if __name__ == '__main__':
                        crossover_type="single_point",
                        mutation_type="random",
                        mutation_percent_genes=10,
-                       init_range_high=10,
-                       init_range_low=-10, 
+                       init_range_high=1,
+                       init_range_low=-1, 
                        random_mutation_min_val = -1.0,
                        random_mutation_max_val = 1.0,
                        on_generation=PooledGA.on_generation,

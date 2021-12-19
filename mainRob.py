@@ -10,6 +10,9 @@ JS Imports
 import PID
 import numpy as np
 
+# TODO remove
+import matplotlib.pyplot as plt
+
 CELLROWS=7
 CELLCOLS=14
 
@@ -54,6 +57,10 @@ class MyRob(CRobLinkAngs):
         last_pos = None
         self.distance = 0
 
+
+        self.temp = []
+        self.pids = []
+
         while True:
             self.readSensors()
 
@@ -74,12 +81,10 @@ class MyRob(CRobLinkAngs):
 
             # reached end
             if self.in_eval and self.checkLapCompleted(grounds[-4:]):
-                # print('Reached end')
                 return
 
             # collision
             if self.in_eval and self.measures.collision:
-                # print('Collided')
                 self.measures.time = float('inf')
                 return
 
@@ -89,8 +94,15 @@ class MyRob(CRobLinkAngs):
                 return
 
             # PID
-            delta = (1/self.measures.irSensor[1] - 1/self.measures.irSensor[3]) # TODO add others
+            delta = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[1]) # TODO add others
             self.pid.update(delta)
+
+            ################################################################
+            self.temp.append(self.measures.irSensor)
+            self.pids.append(self.pid.output)
+            if self.measures.collision:
+                return
+            ################################################################
 
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
@@ -211,18 +223,13 @@ for i in range(1, len(sys.argv),2):
 if __name__ == '__main__':
 
     # angles = [0.0, 90.0, -90.0, 180.0]
-    angles = [45.0, 90.0, -45.0, -90.0]
-    base_speed = 0.1
-    P = 5.087
-    I = -11.748
-    D = -1.017
+    # angles = [45.0, 90.0, -45.0, -90.0]
 
-    # solution = [55, 173, 2.15, 56.988, 43.866, 49.003]
-    # angles = [solution[0], solution[1], -1*solution[0], -1*solution[1]]
-    # base_speed = solution[2]
-    # P = solution[3]
-    # I = solution[4]
-    # D = solution[5]
+    angles = [0.0, 45.0, -45.0, 180.0] # works best!!
+    base_speed = 0.1
+    P = 0
+    I = 0
+    D = 0
 
     rob=MyRob(rob_name, pos, angles, host, 
         base_speed=base_speed,
@@ -234,7 +241,22 @@ if __name__ == '__main__':
         rob.setMap(mapc.labMap)
         rob.printMap()
     
-    # msg = "<Start/>"
-    # rob.sock.sendto(msg.encode(), (rob.host, UDP_PORT))
-
+   
     rob.run()
+
+
+
+
+
+    
+
+    # plt.plot(np.divide(1,rob.temp))
+
+    # plt.plot(rob.pids)
+    
+    # leg = [str(x) for x in angles]
+    # leg.append('pid')
+
+    # plt.legend(leg)
+
+    # plt.show()
