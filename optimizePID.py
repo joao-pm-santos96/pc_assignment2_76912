@@ -55,7 +55,7 @@ class PooledGA(pygad.GA):
         
         rob.run()
 
-        return rob.distance
+        return (rob.measures.score / 10) * (rob.distance / 2.0)
 
     @staticmethod
     def fitness_wrapper(idx, solution):
@@ -63,15 +63,21 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def start_sim():
-        explorer = {'x':200, 'y':845}
+        # explorer = {'x':500, 'y':845}
 
-        # start simulation
-        pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
-        pyautogui.hotkey('ctrl', 's')
+        # # start simulation
+        # pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
+        # pyautogui.hotkey('ctrl', 's')
+        
+        pos = None
+        while pos is None:
+            pos = pyautogui.locateCenterOnScreen('start.png', region=(0,0, 200, 200))
+
+        pyautogui.click(pos[0],pos[1])
 
     @staticmethod
     def reset_sim():
-        explorer = {'x':200, 'y':845}
+        explorer = {'x':500, 'y':845}
 
         # reset simulation
         pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
@@ -93,7 +99,7 @@ class PooledGA(pygad.GA):
 
     def cal_pop_fitness(self):
 
-        t = Timer(0.1, PooledGA.start_sim)
+        t = Timer(0.25, PooledGA.start_sim)
         t.start()
         
         with Pool(processes=self.sol_per_pop) as pool:
@@ -127,22 +133,15 @@ MAIN
 """
 if __name__ == '__main__':
 
-
-    # num_genes = 6
-
-    # num_generations = 1000
-    # sol_per_pop = 25
-    # num_parents_mating = int(sol_per_pop * 0.1)
-
     # gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
     # gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
-
 
     num_genes = 4
 
     num_generations = 1000
     sol_per_pop = 50
-    num_parents_mating = int(sol_per_pop * 0.5) if sol_per_pop >= 10 else 1
+    num_parents_mating = int(sol_per_pop * 0.15) 
+    num_parents_mating = num_parents_mating if num_parents_mating > 0 else 1
 
     gene_space = None
     gene_type = float
@@ -158,7 +157,7 @@ if __name__ == '__main__':
                        gene_type=gene_type,
                        gene_space=gene_space,
                        parent_selection_type="sus",
-                       keep_parents=1,
+                       keep_parents=-1,
                        crossover_type="single_point",
                        mutation_type="random",
                        mutation_percent_genes=10,
@@ -173,8 +172,3 @@ if __name__ == '__main__':
 
 
     instance.compute()
-
-
-
-
-

@@ -214,9 +214,9 @@ if __name__ == '__main__':
     # angles = [0.0, 90.0, -90.0, 180.0]
     # angles = [45.0, 90.0, -45.0, -90.0]
 
+    
+    P, I, D, base_speed = [ 2.23071672,  1.16356351, -0.01969641,  0.4289186 ]
     angles = [0.0, 45.0, -45.0, 180.0] # works best!!
-    base_speed = 0.1
-    P, I, D = [0.199, 1.096, 0.003]
 
     rob=MyRob(rob_name, pos, angles, host, 
         base_speed=base_speed,
