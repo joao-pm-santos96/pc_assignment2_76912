@@ -112,7 +112,7 @@ class PooledGA(pygad.GA):
 
             # wait
             pool.close()
-            pool.join() # TODO check RAM
+            pool.join() 
 
         return np.array(pop_fitness.get())
 
@@ -152,15 +152,13 @@ if __name__ == '__main__':
     configLogger()
     pyautogui.PAUSE = 0.1
 
-    # gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
-    # gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
-
     num_genes = 6
     num_generations = 1000
     sol_per_pop = 25
     num_parents_mating = 8
 
-    gene_space = [{'low': 0,'high': 0.1}, None, None, None, [30, 45, 60], {'low': 0,'high': 1}]
+    # gene_space = [{'low': 0,'high': 0.1}, None, None, None, [30, 45, 60], {'low': 0,'high': 1}]
+    gene_space = [None, None, None, None, {'low': 0,'high': 90}, {'low': 0,'high': 1}]
     gene_type = [[float, 6], [float, 6], [float, 6], [float, 6], int, [float, 6]]
 
     gene_init_val = 1.0
@@ -185,6 +183,7 @@ if __name__ == '__main__':
                        crossover_type="uniform",
                        mutation_type="random",
                        allow_duplicate_genes=False,
-                       save_best_solutions=False)
+                       save_best_solutions=False,
+                       stop_criteria="saturate_150")
 
     ga.compute()

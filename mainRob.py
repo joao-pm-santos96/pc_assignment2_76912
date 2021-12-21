@@ -41,7 +41,12 @@ class MyRob(CRobLinkAngs):
     def run(self):
         if self.status != 0:
             print("Connection refused or error")
-            quit()
+
+            if self.in_eval:
+                self.measures.score = 0
+                retur # test this (error intended to not forget ;) )
+            else:
+                quit()
 
         state = 'stop'
         stopped_state = 'run' 
