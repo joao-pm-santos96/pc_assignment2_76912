@@ -11,20 +11,21 @@ from mainRob import MyRob
 import pygad
 import pyautogui
 import time
-from multiprocessing import Pool, current_process
-from threading import Timer
+from multiprocessing import Pool
+# from threading import Timer
 from datetime import datetime
 import numpy as np
+import logging
+logger = logging.getLogger(__name__)
 
 """
 METADATA
 """
 __author__ = 'Joao Santos'
-__copyright__ = 'Copyright December2021, Motofil, S.A.'
+__copyright__ = 'Copyright December2021'
 __credits__ = ['Joao Santos']
 __version__ = '1.0.0'
 __maintainer__ = 'Joao Santos'
-__email__ = 'jpsantos@motofil.com'
 __status__ = 'Production'
 # __license__ = 'GPL'
 
@@ -44,13 +45,15 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        angles = [30.0, 90.0, -30.0, -90.0]
+        base_speed, P, I, D, angle, weight = solution
+        angles = [angle, 90.0, -angle, -90.0]
 
         rob=MyRob(rob_name, pos, angles, host, 
-            base_speed=solution[0], 
-            P=solution[1], 
-            I=solution[2], 
-            D=solution[3],
+            base_speed=base_speed,
+            P=P,
+            I=I,
+            D=D,
+            weight=weight,
             in_eval=True)
         
         rob.run()
@@ -62,64 +65,64 @@ class PooledGA(pygad.GA):
         return PooledGA.fitness_func(solution, idx+1)
 
     @staticmethod
-    def start_sim():
-
-        conn_view = True
-        if conn_view:
-            pos = pyautogui.locateCenterOnScreen('connect.png', region=(10,580,45,45))
-
-            if pos is not None:
-                pyautogui.click(pos[0],pos[1])
-        
-        pos = None
-        while pos is None:
-            pos = pyautogui.locateCenterOnScreen('start.png', region=(0,0, 200, 200))
-
-        pyautogui.click(pos[0],pos[1])
-
-    @staticmethod
-    def reset_sim():
+    def command_sim(command):
         explorer = {'x':430, 'y':300}
 
         # reset simulation
         pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
-        pyautogui.hotkey('ctrl', 'r')
+
+        if command == 'reset':
+            pyautogui.hotkey('ctrl', 'r')
+            logger.debug('Reset Simulator')
+        elif command == 'start':
+            pyautogui.hotkey('ctrl', 's')
+            logger.debug('Start Simulator')
 
     @staticmethod
     def on_fitness(ga, solutions_fitness):
-        PooledGA.reset_sim() # must!        
+        PooledGA.command_sim('reset') # must!        
 
     @staticmethod
     def on_generation(ga):
-        max_fitness = np.amax(ga.last_generation_fitness)
-        max_index = np.argmax(ga.last_generation_fitness)
+        max_fitness = np.max(ga.last_generation_fitness)
 
-        print(f'Generation: {ga.generations_completed} of {ga.num_generations}')
-        print(f'Best fitness: {max_fitness}')
-        print(f'Best solution: {ga.population[max_index]}')
-        print()
+        logger.info(f'Generation: {ga.generations_completed} of {ga.num_generations}')
+        logger.info(f'Best fitness: {max_fitness}')
+
+        for idx in np.where(ga.last_generation_fitness == max_fitness):
+            logger.info(f'Best solution({idx}): {ga.population[idx]}')
         
     @staticmethod
     def on_start(ga):
-        PooledGA.reset_sim()  
+        PooledGA.command_sim('reset') 
+
+    @staticmethod
+    def on_stop(ga, last_population_fitness):
+        PooledGA.command_sim('reset') 
 
     def cal_pop_fitness(self):
-
-        t = Timer(0.2, PooledGA.start_sim)
-        t.start()
         
         with Pool(processes=self.sol_per_pop) as pool:
-            pop_fitness = pool.starmap(PooledGA.fitness_wrapper, list(enumerate(self.population)))   
+            
+            pop_fitness = pool.starmap_async(PooledGA.fitness_wrapper, list(enumerate(self.population)))  
 
-        return np.array(pop_fitness)
+            # start sim
+            time.sleep(1)
+            PooledGA.command_sim('start')
+
+            # wait
+            pool.close()
+            pool.join() # TODO check RAM
+
+        return np.array(pop_fitness.get())
 
     def compute(self):
 
         self.run()
 
         solution, solution_fitness, solution_idx = self.best_solution()
-        print("Parameters of the best solution : {solution}".format(solution=solution))
-        print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+        logger.info("Parameters of the best solution : {solution}".format(solution=solution))
+        logger.info("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
 
         name_append =f'{round(solution_fitness, 3)}_{datetime.now().strftime("%Y.%m.%d_%H.%M.%S")}'
 
@@ -133,29 +136,35 @@ class PooledGA(pygad.GA):
 """
 FUNCTIONS DEFINITIONS
 """
+def configLogger():
+    logger.setLevel(level=logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
+    ch = logging.StreamHandler()
+    ch.setLevel(level=logging.DEBUG)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 """
 MAIN
 """
 if __name__ == '__main__':
 
+    configLogger()
+    pyautogui.PAUSE = 0.1
+
     # gene_space = [{'low': 0,'high': 90}, {'low': 91,'high': 180}, None, None, None, None] 
     # gene_type = [int, int, [float, 3], [float, 3], [float, 3], [float, 3]]
 
-    num_genes = 4
+    num_genes = 6
     num_generations = 1000
-    sol_per_pop = 50
-    num_parents_mating = 20
+    sol_per_pop = 25
+    num_parents_mating = 25
 
-    gene_space = [None] * num_genes
-    gene_space[0] = [0.1]
-
-    gene_type = [float, 5]
+    gene_space = [{'low': 0,'high': 0.1}, None, None, None, [30, 45, 60], {'low': 0,'high': 1}]
+    gene_type = [[float, 6], [float, 6], [float, 6], [float, 6], int, [float, 6]]
 
     gene_init_val = 1.0
-    random_mutation_val = 0.5
-
-    pyautogui.PAUSE = 0.2
+    random_mutation_val = 0.5    
 
     ga = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -169,14 +178,13 @@ if __name__ == '__main__':
                        random_mutation_max_val = random_mutation_val,
                        fitness_func=PooledGA.fitness_func,
                        on_generation=PooledGA.on_generation,
-                       on_fitness=PooledGA.on_fitness,  
-                       mutation_probability=0.15,
-                       parent_selection_type="tournament",
-                       K_tournament = 3,
+                       on_fitness=PooledGA.on_fitness, 
+                       on_stop=PooledGA.on_stop,
+                       mutation_probability=0.4,
+                       parent_selection_type="sus",
                        crossover_type="uniform",
                        mutation_type="random",
-                       allow_duplicate_genes=True,
+                       allow_duplicate_genes=False,
                        save_best_solutions=False)
-
 
     ga.compute()

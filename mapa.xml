@@ -1,0 +1,22 @@
+<Lab Name="RMI-2122 C1 Lab" Height="14" Width="28">
+		<Beacon X="3" Y="11.0" Height="4.0"/>
+		<Target X="3" Y="11.0" Radius="1.0"/>
+		<Beacon X="17" Y="9.0" Height="4.0"/>
+		<Target X="17" Y="9.0" Radius="1.0"/>
+		<Beacon X="9" Y="5.0" Height="4.0"/>
+		<Target X="9" Y="5.0" Radius="1.0"/>
+		<Row  Pos="12" Pattern="           |04 05 06 07 08|              "  />
+		<Row  Pos="11" Pattern="--+--+--+--+  +--+--+--+  +  +  +  +  +  "  />
+		<Row  Pos="10" Pattern="39 00 01 02 03|        |09|              "  />
+		<Row  Pos="9"  Pattern="  +--+--+--+--+  +--+--+  +--+  +  +  +  "  />
+		<Row  Pos="8"  Pattern="38 37|           |22 21|10 11|           "  />
+		<Row  Pos="7"  Pattern="--+  +  +  +  +--+  +  +--+  +--+  +  +  "  />
+		<Row  Pos="6"  Pattern="  |36|        |24 23|20|  |12 13|        "  />
+		<Row  Pos="5"  Pattern="--+  +--+--+--+  +--+  +--+--+  +  +  +  "  />
+		<Row  Pos="4"  Pattern="34 35|28 27 26 25|  |19|16 15 14|        "  />
+		<Row  Pos="3"  Pattern="  +--+  +--+--+--+  +  +  +--+--+  +  +  "  />
+		<Row  Pos="2"  Pattern="33|  |29|           |18 17|      TT      "  />
+		<Row  Pos="1"  Pattern="  +--+  +  +  +  +  +--+--+  +  +  +  +  "  />
+		<Row  Pos="0"  Pattern="32 31 30|                                "  />
+</Lab>
+
