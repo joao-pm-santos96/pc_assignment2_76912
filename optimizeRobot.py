@@ -158,7 +158,7 @@ if __name__ == '__main__':
     num_genes = 6
     num_generations = 1000
     sol_per_pop = 25
-    num_parents_mating = 25
+    num_parents_mating = 8
 
     gene_space = [{'low': 0,'high': 0.1}, None, None, None, [30, 45, 60], {'low': 0,'high': 1}]
     gene_type = [[float, 6], [float, 6], [float, 6], [float, 6], int, [float, 6]]

@@ -76,24 +76,17 @@ class MyRob(CRobLinkAngs):
             
             # stop conditions
 
-            # reached end
-            # if self.in_eval and self.checkLapCompleted(grounds[-4:]):
-            #     return
-
             # collision
             if self.in_eval and self.measures.collision:
-                # self.measures.time = float('inf')
                 return
 
             # taking too long
-            if self.in_eval and self.measures.time > 500:
-                # print('Took too long')
+            if self.in_eval and not self.measures.start and not self.measures.stop:
                 return
 
             # PID
-            delta1 = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[0]) # TODO add others
-            delta2 = (1/self.measures.irSensor[3] - 1/self.measures.irSensor[1]) # TODO add others
-
+            delta1 = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[0]) 
+            delta2 = (1/self.measures.irSensor[3] - 1/self.measures.irSensor[1]) 
             self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
 
             if self.measures.endLed:
@@ -214,20 +207,9 @@ for i in range(1, len(sys.argv),2):
 
 if __name__ == '__main__':
 
-    # angles = [0.0, 90.0, -90.0, 180.0]
     
-
-    
-    base_speed, P, I, D, angle, weight = [0.1, 0.25, 0, 0, 45, 0.5]
+    base_speed, P, I, D, angle, weight = [0.098137, 0.564135 ,1.029233, -0.017456, 60 ,0.968719] # IT WORKS (but slow)!!!
     angles = [angle, 90.0, -angle, -90.0]
-
-
-
-
-
-
-    # P, I, D, base_speed = [0.25,0,0,0.1]
-    # angles = [0.0, 45.0, -45.0, 180.0] # works best!!
 
     rob=MyRob(rob_name, pos, angles, host, 
         base_speed=base_speed,
