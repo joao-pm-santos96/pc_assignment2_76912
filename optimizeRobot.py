@@ -87,10 +87,9 @@ class PooledGA(pygad.GA):
         max_fitness = np.max(ga.last_generation_fitness)
 
         logger.info(f'Generation: {ga.generations_completed} of {ga.num_generations}')
-        logger.info(f'Best fitness: {max_fitness}')
-
         for idx in np.where(ga.last_generation_fitness == max_fitness):
             logger.info(f'Best solution({idx}): {ga.population[idx]}')
+        logger.info(f'Best fitness: {max_fitness}')
         
     @staticmethod
     def on_start(ga):
@@ -154,8 +153,8 @@ if __name__ == '__main__':
 
     num_genes = 6
     num_generations = 1000
-    sol_per_pop = 25
-    num_parents_mating = 8
+    sol_per_pop = 100
+    num_parents_mating = 15
 
     # gene_space = [{'low': 0,'high': 0.1}, None, None, None, [30, 45, 60], {'low': 0,'high': 1}]
     gene_space = [None, None, None, None, {'low': 0,'high': 90}, {'low': 0,'high': 1}]

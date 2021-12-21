@@ -44,7 +44,7 @@ class MyRob(CRobLinkAngs):
 
             if self.in_eval:
                 self.measures.score = 0
-                retur # test this (error intended to not forget ;) )
+                return # test this (error intended to not forget ;) )
             else:
                 quit()
 
