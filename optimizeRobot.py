@@ -156,8 +156,7 @@ if __name__ == '__main__':
     sol_per_pop = 100
     num_parents_mating = 15
 
-    # gene_space = [{'low': 0,'high': 0.1}, None, None, None, [30, 45, 60], {'low': 0,'high': 1}]
-    gene_space = [None, None, None, None, {'low': 0,'high': 90}, {'low': 0,'high': 1}]
+    gene_space = [{'low': 0,'high': 0.5}, None, None, None, {'low': 0,'high': 90}, {'low': 0,'high': 1}] # TODO test this one
     gene_type = [[float, 6], [float, 6], [float, 6], [float, 6], int, [float, 6]]
 
     gene_init_val = 1.0

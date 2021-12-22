@@ -213,7 +213,13 @@ for i in range(1, len(sys.argv),2):
 if __name__ == '__main__':
 
     
-    base_speed, P, I, D, angle, weight = [0.098137, 0.564135 ,1.029233, -0.017456, 60 ,0.968719] # IT WORKS (but slow)!!!
+    base_speed, P, I, D, angle, weight = [1.49835e+00,
+            7.042116e+00,
+            6.12267e-01,
+            -7.6116e-02,
+            6.2e+01,
+            9.07367e-01]
+
     angles = [angle, 90.0, -angle, -90.0]
 
     rob=MyRob(rob_name, pos, angles, host, 
