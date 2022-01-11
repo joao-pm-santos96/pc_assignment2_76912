@@ -90,6 +90,7 @@ class PooledGA(pygad.GA):
         for idx in np.where(ga.last_generation_fitness == max_fitness):
             logger.info(f'Best solution({idx}): {ga.population[idx]}')
         logger.info(f'Best fitness: {max_fitness}')
+        logger.info('='*20)
         
     @staticmethod
     def on_start(ga):
