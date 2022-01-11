@@ -157,7 +157,7 @@ if __name__ == '__main__':
     sol_per_pop = 100
     num_parents_mating = 15
 
-    gene_space = [{'low': 0,'high': 0.5}, None, None, None, {'low': 0,'high': 90}, {'low': 0,'high': 1}] # TODO test this one
+    gene_space = [{'low': 0,'high': 1}, None, None, None, {'low': 0,'high': 90}, {'low': 0,'high': 1}] # TODO test this one
     gene_type = [[float, 6], [float, 6], [float, 6], [float, 6], int, [float, 6]]
 
     gene_init_val = 1.0
@@ -182,7 +182,7 @@ if __name__ == '__main__':
                        crossover_type="uniform",
                        mutation_type="random",
                        allow_duplicate_genes=False,
-                       save_best_solutions=False,
-                       stop_criteria="saturate_150")
+                       save_best_solutions=False)
+                    #    stop_criteria="saturate_150")
 
     ga.compute()

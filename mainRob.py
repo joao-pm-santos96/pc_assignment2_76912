@@ -60,7 +60,6 @@ class MyRob(CRobLinkAngs):
         # localization
         last_ground = -1
         grounds = []
-        measures = []
 
         last_pos = None
         self.distance = 0
@@ -92,23 +91,9 @@ class MyRob(CRobLinkAngs):
                 return
 
             # # PID
-            # delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0]) 
-            # delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1]) 
-            # self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
-
-            # PID and meadian filter
-            measures.append(self.measures.irSensor)
-            if len(measures) == 5:
-                med0 = statistics.median([measures[x][0] for x in range(len(measures))])
-                med1 = statistics.median([measures[x][1] for x in range(len(measures))])
-                med2 = statistics.median([measures[x][2] for x in range(len(measures))])
-                med3 = statistics.median([measures[x][3] for x in range(len(measures))])
-
-                delta1 = med2-med0
-                delta2 = med3-med1
-                self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
-
-                measures = []
+            delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0]) 
+            delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1]) 
+            self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
 
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
