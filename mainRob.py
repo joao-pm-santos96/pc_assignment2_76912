@@ -90,8 +90,8 @@ class MyRob(CRobLinkAngs):
                 return
 
             # PID
-            delta1 = (1/self.measures.irSensor[2] - 1/self.measures.irSensor[0]) 
-            delta2 = (1/self.measures.irSensor[3] - 1/self.measures.irSensor[1]) 
+            delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0]) 
+            delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1]) 
             self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
 
             if self.measures.endLed:
@@ -212,13 +212,12 @@ for i in range(1, len(sys.argv),2):
 
 if __name__ == '__main__':
 
-    
-    base_speed, P, I, D, angle, weight = [1.49835e+00,
-            7.042116e+00,
-            6.12267e-01,
-            -7.6116e-02,
-            6.2e+01,
-            9.07367e-01]
+    base_speed, P, I, D, angle, weight = [1.683070000000000122e-01,
+-5.491549999999999487e-01,
+-6.279099999999999959e-02,
+3.921000000000000006e-03,
+4.400000000000000000e+01,
+9.848639999999999617e-01]
 
     angles = [angle, 90.0, -angle, -90.0]
 
