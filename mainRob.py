@@ -98,7 +98,7 @@ class MyRob(CRobLinkAngs):
 
             # PID and meadian filter
             measures.append(self.measures.irSensor)
-            if len(measures) == 7:
+            if len(measures) == 5:
                 med0 = statistics.median([measures[x][0] for x in range(len(measures))])
                 med1 = statistics.median([measures[x][1] for x in range(len(measures))])
                 med2 = statistics.median([measures[x][2] for x in range(len(measures))])
