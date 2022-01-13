@@ -45,8 +45,8 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        base_speed, P, I, D, angle, weight = solution
-        angles = [angle, 90.0, -angle, -90.0]
+        base_speed, P, I, D, angle0, angle1, weight = solution
+        angles = [angle0, angle1, -angle0, -angle1]
 
         rob=MyRob(rob_name, pos, angles, host, 
             base_speed=base_speed,
@@ -152,13 +152,13 @@ if __name__ == '__main__':
     configLogger()
     pyautogui.PAUSE = 0.1
 
-    num_genes = 6
+    num_genes = 7
     num_generations = 1000
     sol_per_pop = 100
     num_parents_mating = 15
 
-    gene_space = [{'low': 0,'high': 1}, None, None, None, {'low': 0,'high': 90}, {'low': 0,'high': 1}] # TODO test this one
-    gene_type = [[float, 6], [float, 6], [float, 6], [float, 6], int, [float, 6]]
+    gene_space = [{'low': 0,'high': 1}, None, None, None, {'low': 0,'high': 180}, {'low': 0,'high': 180}, {'low': 0,'high': 1}] # TODO test this one
+    gene_type = [[float, 6], [float, 6], [float, 6], [float, 6], int, int, [float, 6]]
 
     gene_init_val = 1.0
     random_mutation_val = 0.5    
@@ -182,7 +182,7 @@ if __name__ == '__main__':
                        crossover_type="uniform",
                        mutation_type="random",
                        allow_duplicate_genes=False,
-                       save_best_solutions=False)
-                    #    stop_criteria="saturate_150")
+                       save_best_solutions=False,
+                       stop_criteria="saturate_150")
 
     ga.compute()
