@@ -1,10 +1,15 @@
 #!/bin/bash
 
-ARGS="--param pid-config.xml"
-ARGS+=" --lab ./ciberRatoTools/Labs/rmi-2122/C1-lab.xml"
-ARGS+=" --grid ./pid-grid.xml"
+ARGS="--param "$(dirname "$PWD")"/ciberRatoTools/Labs/rmi-2122/C1-config.xml"
+ARGS+=" --lab "$(dirname "$PWD")"/ciberRatoTools/Labs/rmi-2122/C1-lab.xml"
+ARGS+=" --grid "$PWD"/pid-grid.xml"
 ARGS+=" --scoring 1"
 
-(./simulator $ARGS) 
+$(dirname "$PWD")/ciberRatoTools/simulator/simulator $ARGS
+
+# (cd Viewer; ./Viewer --autoconnect)
+
+# killall simulator
 
 echo Bye
+
