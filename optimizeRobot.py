@@ -183,6 +183,6 @@ if __name__ == '__main__':
                        mutation_type="random",
                        allow_duplicate_genes=False,
                        save_best_solutions=False,
-                       stop_criteria="saturate_150")
+                       stop_criteria="saturate_50")
 
     ga.compute()
