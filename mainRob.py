@@ -9,10 +9,6 @@ JS Imports
 """
 import PID
 import numpy as np
-import statistics
-
-# TODO remove
-import matplotlib.pyplot as plt
 
 CELLROWS=7
 CELLCOLS=14
@@ -50,7 +46,7 @@ class MyRob(CRobLinkAngs):
                 quit()
 
         state = 'stop'
-        stopped_state = 'run' 
+        stopped_state = 'run'
 
         # initialize PID
         self.pid = PID.PID(self.P, self.I, self.D)
@@ -79,7 +75,7 @@ class MyRob(CRobLinkAngs):
             if (self.measures.ground != last_ground) and self.measures.ground != -1:
                 grounds.append(self.measures.ground)
                 last_ground = self.measures.ground
-            
+
             # stop conditions
 
             # collision
@@ -91,8 +87,8 @@ class MyRob(CRobLinkAngs):
                 return
 
             # # PID
-            delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0]) 
-            delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1]) 
+            delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0])
+            delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1])
             self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
 
             if self.measures.endLed:
@@ -124,8 +120,8 @@ class MyRob(CRobLinkAngs):
                     self.setVisitingLed(False)
                 if self.measures.returningLed==True:
                     self.setReturningLed(False)
-                self.wander()           
-            
+                self.wander()
+
 
     def wander(self):
         # center_id = 0
@@ -164,12 +160,12 @@ class MyRob(CRobLinkAngs):
 
     def checkLapCompleted(self, last_four):
         return tuple(last_four) == (0, 1, 2, 0) if len(last_four) == 4 else False
-   
+
 class Map():
     def __init__(self, filename):
         tree = ET.parse(filename)
         root = tree.getroot()
-        
+
         self.labMap = [[' '] * (CELLCOLS*2-1) for i in range(CELLROWS*2-1) ]
         i=1
         for child in root.iter('Row'):
@@ -189,7 +185,7 @@ class Map():
                            self.labMap[row][c//3*2]='-'
                        else:
                            None
-               
+
            i=i+1
 
 
@@ -214,16 +210,16 @@ for i in range(1, len(sys.argv),2):
 if __name__ == '__main__':
 
     base_speed, P, I, D, angle0, angle1, weight = [2.367360000000000020e-01,
--1.053395000000000081e+00,
--2.422829999999999984e-01,
-1.160000000000000007e-04,
-8.000000000000000000e+00,
-4.900000000000000000e+01,
-5.674900000000000500e-01]
+                                                -1.053395000000000081e+00,
+                                                -2.422829999999999984e-01,
+                                                1.160000000000000007e-04,
+                                                8.000000000000000000e+00,
+                                                4.900000000000000000e+01,
+                                                5.674900000000000500e-01]
 
     angles = [angle0, angle1, -angle0, -angle1]
 
-    rob=MyRob(rob_name, pos, angles, host, 
+    rob=MyRob(rob_name, pos, angles, host,
         base_speed=base_speed,
         P=P,
         I=I,
@@ -233,8 +229,8 @@ if __name__ == '__main__':
     if mapc != None:
         rob.setMap(mapc.labMap)
         rob.printMap()
-    
-    
+
+
     rob.run()
 
 
