@@ -6,6 +6,7 @@
 """
 IMPORTS
 """
+from signal import raise_signal
 from mainRob import MyRob
 
 import pygad
@@ -45,15 +46,17 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        base_speed, P, I, D, angle0, angle1, weight = solution
-        angles = [angle0, angle1, -angle0, -angle1]
+        base_speed, P, I, D, set_point, alpha, beta, w0, w1, w2, w3 = solution
+        angles = [alpha, beta, -alpha, -beta]
+        weights = [w0, w1, w2, w3]
 
         rob=MyRob(rob_name, pos, angles, host, 
             base_speed=base_speed,
             P=P,
             I=I,
             D=D,
-            weight=weight,
+            set_point=set_point,
+            weights=weights,
             in_eval=True)
         
         rob.run()
@@ -152,13 +155,39 @@ if __name__ == '__main__':
     configLogger()
     pyautogui.PAUSE = 0.1
 
-    num_genes = 7
+    gene_space = [{'low': 0,'high': 2}, # linear speed
+                    None, # P
+                    None, # I
+                    None, # D
+                    None, # set-point
+                    {'low': 0,'high': 180}, # alpha
+                    {'low': 0,'high': 180}, # beta
+                    {'low': -1, 'high': 1}, # weight0
+                    {'low': -1, 'high': 1}, # weight1
+                    {'low': -1, 'high': 1}, # weight2
+                    {'low': -1, 'high': 1} # weight3
+                    ] 
+
+    gene_type = [[float, 6], # linear speed
+                [float, 6], # P
+                [float, 6], # I
+                [float, 6], # D
+                [float, 6], # set-point
+                int, # alpha
+                int, # beta
+                [float, 6], # weight0
+                [float, 6], # weight1
+                [float, 6], # weight2
+                [float, 6] # weight3
+                ]
+
+    if len(gene_space) != len(gene_type):
+        raise Exception('== GENE SPACE and GENE TYPE have different lengths')
+
+    num_genes = len(gene_space)
     num_generations = 1000
     sol_per_pop = 100
     num_parents_mating = 15
-
-    gene_space = [{'low': 0,'high': 1}, None, None, None, {'low': 0,'high': 180}, {'low': 0,'high': 180}, {'low': 0,'high': 1}] 
-    gene_type = [[float, 6], [float, 6], [float, 6], [float, 6], int, int, [float, 6]]
 
     gene_init_val = 1.0
     random_mutation_val = 0.5    
@@ -183,6 +212,6 @@ if __name__ == '__main__':
                        mutation_type="random",
                        allow_duplicate_genes=False,
                        save_best_solutions=False,
-                       stop_criteria="saturate_50")
+                       stop_criteria="saturate_100")
 
     ga.compute()
