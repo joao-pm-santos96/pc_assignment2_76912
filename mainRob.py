@@ -86,7 +86,7 @@ class MyRob(CRobLinkAngs):
             if self.in_eval and not self.measures.start and not self.measures.stop:
                 return
 
-            # # PID
+            # PID
             delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0])
             delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1])
             self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
