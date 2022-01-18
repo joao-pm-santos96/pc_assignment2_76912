@@ -14,16 +14,28 @@ CELLROWS=7
 CELLCOLS=14
 
 class MyRob(CRobLinkAngs):
-    def __init__(self, rob_name, rob_id, angles, host, base_speed = 0.1, P=0, I=0, D=0, weight=0.5, in_eval= False):
+    def __init__(self, 
+                rob_name, 
+                rob_id, 
+                angles, 
+                host, 
+                base_speed=0.1, 
+                P=0, 
+                I=0, 
+                D=0, 
+                set_point=0.0,
+                weights=[.25]*NUM_IR_SENSORS, 
+                in_eval= False):
+
         CRobLinkAngs.__init__(self, rob_name, rob_id, angles, host)
 
+        self.sample_time = 1e-3 # seconds
         self.base_speed = base_speed
         self.P = P
         self.I = I
         self.D = D
-        self.set_point = 0.0
-        self.sample_time = 1e-3 # seconds
-        self.weight = weight
+        self.set_point = set_point
+        self.weights = weights
         self.in_eval = in_eval
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
@@ -87,9 +99,11 @@ class MyRob(CRobLinkAngs):
                 return
 
             # PID
-            delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0])
-            delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1])
-            self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
+            # delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0])
+            # delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1])
+            # self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
+            val = np.sum(np.multiply(self.weights, self.measures.irSensor))
+            self.pid.update(val)
 
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
