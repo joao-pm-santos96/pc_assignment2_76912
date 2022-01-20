@@ -229,31 +229,23 @@ for i in range(1, len(sys.argv),2):
         quit()
 
 if __name__ == '__main__':
-    pass
 
-    # base_speed, P, I, D, angle0, angle1, weight = [2.367360000000000020e-01,
-    #                                             -1.053395000000000081e+00,
-    #                                             -2.422829999999999984e-01,
-    #                                             1.160000000000000007e-04,
-    #                                             8.000000000000000000e+00,
-    #                                             4.900000000000000000e+01,
-    #                                             5.674900000000000500e-01]
+    # setup agent
+    solution = []
+    
+    angles = [solution[0], solution[1], -solution[0], -solution[1]]
+    weights = solution[2:]
 
-    # angles = [angle0, angle1, -angle0, -angle1]
+    rob=MyRob(rob_name, pos, angles, host, 
+        in_eval=True)
 
-    # rob=MyRob(rob_name, pos, angles, host,
-    #     base_speed=base_speed,
-    #     P=P,
-    #     I=I,
-    #     D=D,
-    #     weight=weight)
+    if mapc != None:
+        rob.setMap(mapc.labMap)
+        rob.printMap()    
 
-    # if mapc != None:
-    #     rob.setMap(mapc.labMap)
-    #     rob.printMap()
-
-
-    # rob.run()
+    rob.createNetwork(4, 2, [4, 3], output_activation='None') 
+    rob.updateNNWeights(weights)
+    rob.run()
 
 
 
