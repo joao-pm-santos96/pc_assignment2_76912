@@ -157,8 +157,8 @@ if __name__ == '__main__':
 
     n_weights = sum([hidden_layers[i] * hidden_layers[i+1] for i in range(len(hidden_layers)-1)]) + n_inputs * hidden_layers[0] + n_outputs * hidden_layers[-1]
 
-    gene_space = [{'low': 0,'high': 180}, # alpha
-                {'low': 0,'high': 180}, # beta
+    gene_space = [{'low': 0,'high': 90}, # alpha
+                {'low': 0,'high': 90}, # beta
     ]
     gene_space.extend([None] * n_weights) # NN weights
 
@@ -196,7 +196,7 @@ if __name__ == '__main__':
                        parent_selection_type="sus",
                        crossover_type="uniform",
                        mutation_type="random",
-                       allow_duplicate_genes=False,
+                       allow_duplicate_genes=True,
                        save_best_solutions=False,
                        stop_criteria="saturate_100")
 
