@@ -165,7 +165,7 @@ if __name__ == '__main__':
     gene_type = [int, # alpha
                 int, # beta
     ]
-    gene_type.extend([float] * n_weights) # NN weights
+    gene_type.extend([[float, 6] for _ in range(n_weights)]) # NN weights
 
     if len(gene_space) != len(gene_type):
         raise Exception('== GENE SPACE and GENE TYPE have different lengths')
@@ -173,10 +173,10 @@ if __name__ == '__main__':
     num_genes = len(gene_space)
     num_generations = 1000
     sol_per_pop = 100
-    num_parents_mating = 15
+    num_parents_mating = 25
 
-    gene_init_val = 1.0
-    random_mutation_val = 0.5    
+    gene_init_val = 5.0
+    random_mutation_val = 1.0   
 
     ga = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -192,7 +192,7 @@ if __name__ == '__main__':
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness, 
                        on_stop=PooledGA.on_stop,
-                       mutation_probability=0.4,
+                       mutation_probability=0.1,
                        parent_selection_type="sus",
                        crossover_type="uniform",
                        mutation_type="random",
