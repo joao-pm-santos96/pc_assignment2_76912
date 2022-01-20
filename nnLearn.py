@@ -11,6 +11,7 @@ from nnRob import MyRob
 
 import pygad
 import pyautogui
+import matplotlib.pyplot
 import time
 from multiprocessing import Pool
 # from threading import Timer
@@ -33,6 +34,9 @@ __status__ = 'Production'
 """
 TODO
 """
+N_INPUTS = 4
+N_OUTPUTS = 2
+HIDDEN_LAYERS = [5, 3]
 
 """
 CLASS DEFINITIONS
@@ -52,7 +56,7 @@ class PooledGA(pygad.GA):
         rob=MyRob(rob_name, pos, angles, host, 
             in_eval=True)
         
-        rob.createNetwork(4, 2, [4, 3], output_activation='None') # TODO do not repeat
+        rob.createNetwork(N_INPUTS, N_OUTPUTS, HIDDEN_LAYERS, output_activation='None') # TODO do not repeat
         rob.updateNNWeights(weights)
         rob.run()
 
@@ -89,6 +93,25 @@ class PooledGA(pygad.GA):
         logger.info(f'Generation: {ga.generations_completed} of {ga.num_generations}')
         logger.info(f'Best fitness: {max_fitness}')
         logger.info('='*20)
+
+        if ga.generations_completed >= 1:
+            title="PyGAD - Generation vs. Fitness"
+            xlabel="Generation"
+            ylabel="Fitness"
+            linewidth=3
+            font_size=14
+            color="#3870FF"
+
+            with matplotlib.pyplot.ion():
+                matplotlib.pyplot.figure(1)
+                matplotlib.pyplot.plot(ga.best_solutions_fitness, linewidth=linewidth, color=color)
+                # matplotlib.pyplot.title(title, fontsize=font_size)
+                matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
+                matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
+
+                matplotlib.pyplot.show(block=False)
+                # fig.draw()
+                matplotlib.pyplot.pause(1)
         
     @staticmethod
     def on_start(ga):
@@ -151,11 +174,7 @@ if __name__ == '__main__':
     configLogger()
     pyautogui.PAUSE = 0.1
 
-    n_inputs = 4
-    n_outputs = 2
-    hidden_layers = [4, 3]
-
-    n_weights = sum([hidden_layers[i] * hidden_layers[i+1] for i in range(len(hidden_layers)-1)]) + n_inputs * hidden_layers[0] + n_outputs * hidden_layers[-1]
+    n_weights = sum([HIDDEN_LAYERS[i] * HIDDEN_LAYERS[i+1] for i in range(len(HIDDEN_LAYERS)-1)]) + N_INPUTS * HIDDEN_LAYERS[0] + N_OUTPUTS * HIDDEN_LAYERS[-1]
 
     gene_space = [{'low': 0,'high': 90}, # alpha
                 {'low': 0,'high': 90}, # beta
@@ -168,15 +187,15 @@ if __name__ == '__main__':
     gene_type.extend([[float, 6] for _ in range(n_weights)]) # NN weights
 
     if len(gene_space) != len(gene_type):
-        raise Exception('== GENE SPACE and GENE TYPE have different lengths')
+        raise Exception('== GENE SPACE and GENE TYPE have different lengths ==')
 
     num_genes = len(gene_space)
     num_generations = 1000
     sol_per_pop = 100
     num_parents_mating = 25
 
-    gene_init_val = 5.0
-    random_mutation_val = 1.0   
+    gene_init_val = 10.0
+    random_mutation_val = 2.0   
 
     ga = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -192,13 +211,12 @@ if __name__ == '__main__':
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness, 
                        on_stop=PooledGA.on_stop,
-                       mutation_probability=0.1,
+                       mutation_probability=0.15,
                        parent_selection_type="sus",
                        crossover_type="uniform",
                        mutation_type="random",
                        allow_duplicate_genes=True,
-                       save_best_solutions=False,
-                       stop_criteria="saturate_100")
+                       save_best_solutions=False)
 
     ga.compute()
 
