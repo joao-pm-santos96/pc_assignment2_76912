@@ -159,7 +159,7 @@ if __name__ == '__main__':
                     None, # P
                     None, # I
                     None, # D
-                    None, # set-point
+                    [0], # set-point
                     {'low': 0,'high': 180}, # alpha
                     {'low': 0,'high': 180}, # beta
                     {'low': -1, 'high': 1}, # weight0
