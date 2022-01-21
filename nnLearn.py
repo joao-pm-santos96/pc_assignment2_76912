@@ -94,24 +94,6 @@ class PooledGA(pygad.GA):
         logger.info(f'Best fitness: {max_fitness}')
         logger.info('='*20)
 
-        if ga.generations_completed >= 1:
-            title="PyGAD - Generation vs. Fitness"
-            xlabel="Generation"
-            ylabel="Fitness"
-            linewidth=3
-            font_size=14
-            color="#3870FF"
-
-            with matplotlib.pyplot.ion():
-                matplotlib.pyplot.figure(1)
-                matplotlib.pyplot.plot(ga.best_solutions_fitness, linewidth=linewidth, color=color)
-                # matplotlib.pyplot.title(title, fontsize=font_size)
-                matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
-                matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
-
-                matplotlib.pyplot.show(block=False)
-                # fig.draw()
-                matplotlib.pyplot.pause(1)
         
     @staticmethod
     def on_start(ga):
