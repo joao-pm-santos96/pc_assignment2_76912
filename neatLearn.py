@@ -45,7 +45,7 @@ def eval_genome(pos, genome, config):
     pos = int(pos+1)
     rob_name = "neat_" + str(pos)
     
-    angles = [45, -45, 90, -90] # TODO
+    angles = [10, -10, 50, -50] # TODO
 
     net = neat.nn.FeedForwardNetwork.create(genome, config)      
 
@@ -56,17 +56,34 @@ def eval_genome(pos, genome, config):
 
     return rob.measures.score
 
+def single_eval(genomes, config):
 
-def test(genomes, config):
+    for genome_idx, genome in genomes:
+        command_sim('reset')
+
+        with Pool(1) as pool:
+            fitness = pool.starmap_async(eval_genome, [(0, genome, config)])
+
+            time.sleep(1)
+            command_sim('viewer')
+            command_sim('start')
+
+            # wait
+            pool.close()
+            pool.join()
+
+        genome.fitness = fitness.get()[0]
+
+def pool_eval(genomes, config):
 
     command_sim('reset')
-    time.sleep(1)
+    time.sleep(0.1)
 
     with Pool(len(genomes)) as pool:
         pop_fitness = pool.starmap_async(eval_genome, [(idx, genome[1], config) for idx, genome in enumerate(genomes)])
         
         # start sim
-        time.sleep(1)
+        time.sleep(0.1)
         command_sim('start')
 
         # wait
@@ -94,7 +111,7 @@ def run(config_file):
     p.add_reporter(neat.Checkpointer(5))
 
     # Run 
-    winner = p.run(test, 10)
+    winner = p.run(pool_eval, 1000)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
@@ -109,17 +126,22 @@ def run(config_file):
 
 
 def command_sim(command):
-    explorer = {'x':430, 'y':300}
 
-    # reset simulation
-    pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
+    simulator = {'x':430, 'y':150}
+    viewer = {'x':430, 'y':750}
 
     if command == 'reset':
+        pyautogui.click(x=simulator['x'], y=simulator['y'], clicks=1, button='left')
         pyautogui.hotkey('ctrl', 'r')
         logger.debug('Reset Simulator')
     elif command == 'start':
+        pyautogui.click(x=simulator['x'], y=simulator['y'], clicks=1, button='left')
         pyautogui.hotkey('ctrl', 's')
         logger.debug('Start Simulator')
+    elif command == 'viewer':
+        pyautogui.click(x=viewer['x'], y=viewer['y'], clicks=1, button='left')
+        pyautogui.hotkey('ctrl', 'c')
+        logger.debug('Start Viewer')
 
 def configLogger():
     logger.setLevel(level=logging.DEBUG)

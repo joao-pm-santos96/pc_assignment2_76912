@@ -117,6 +117,7 @@ class MyRob(CRobLinkAngs):
     def wander(self):
 
         output = self.nn.activate(self.measures.irSensor)
+        output = np.round(output, 4)
         self.driveMotors(output[0], output[1])
 
     """
