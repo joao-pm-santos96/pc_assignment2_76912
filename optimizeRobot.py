@@ -46,8 +46,8 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        base_speed, P, I, D, set_point, alpha, beta, w0, w1, w2, w3 = solution
-        angles = [alpha, beta, -alpha, -beta]
+        base_speed, P, I, D, set_point, alpha0, alpha1, alpha2, alpha3, w0, w1, w2, w3 = solution
+        angles = [alpha0, alpha1, alpha2, alpha3]
         weights = [w0, w1, w2, w3]
 
         rob=MyRob(rob_name, pos, angles, host, 
@@ -159,9 +159,11 @@ if __name__ == '__main__':
                     None, # P
                     None, # I
                     None, # D
-                    [0], # set-point
-                    {'low': 0,'high': 180}, # alpha
-                    {'low': 0,'high': 180}, # beta
+                    None, # set-point
+                    {'low': -180,'high': 180}, # alpha0
+                    {'low': -180,'high': 180}, # alpha1
+                    {'low': -180,'high': 180}, # alpha2
+                    {'low': -180,'high': 180}, # alpha3
                     {'low': -1, 'high': 1}, # weight0
                     {'low': -1, 'high': 1}, # weight1
                     {'low': -1, 'high': 1}, # weight2
@@ -173,8 +175,10 @@ if __name__ == '__main__':
                 [float, 6], # I
                 [float, 6], # D
                 [float, 6], # set-point
-                int, # alpha
-                int, # beta
+                int, # alpha0
+                int, # alpha1
+                int, # alpha2
+                int, # alpha4
                 [float, 6], # weight0
                 [float, 6], # weight1
                 [float, 6], # weight2
@@ -182,15 +186,15 @@ if __name__ == '__main__':
                 ]
 
     if len(gene_space) != len(gene_type):
-        raise Exception('== GENE SPACE and GENE TYPE have different lengths')
+        raise Exception('== GENE SPACE and GENE TYPE have different lengths ==')
 
     num_genes = len(gene_space)
     num_generations = 1000
     sol_per_pop = 100
-    num_parents_mating = 15
+    num_parents_mating = 25
 
     gene_init_val = 1.0
-    random_mutation_val = 0.5    
+    random_mutation_val = 2.0    
 
     ga = PooledGA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
@@ -210,8 +214,7 @@ if __name__ == '__main__':
                        parent_selection_type="sus",
                        crossover_type="uniform",
                        mutation_type="random",
-                       allow_duplicate_genes=False,
-                       save_best_solutions=False,
-                       stop_criteria="saturate_100")
+                       allow_duplicate_genes=True,
+                       save_best_solutions=False)
 
     ga.compute()

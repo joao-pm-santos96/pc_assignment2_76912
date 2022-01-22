@@ -52,6 +52,7 @@ class MyRob(CRobLinkAngs):
             print("Connection refused or error")
 
             if self.in_eval:
+                self.measures = CMeasures()
                 self.measures.score = 0
                 return # test this (error intended to not forget ;) )
             else:
