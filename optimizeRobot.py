@@ -8,13 +8,14 @@ IMPORTS
 """
 from signal import raise_signal
 from mainRob import MyRob
+from multiprocessing import Pool
+from datetime import datetime
+from tabulate import tabulate
 
 import pygad
 import pyautogui
 import time
-from multiprocessing import Pool
 # from threading import Timer
-from datetime import datetime
 import numpy as np
 import logging
 logger = logging.getLogger(__name__)
@@ -46,16 +47,16 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        base_speed, P, I, D, set_point, alpha0, alpha1, alpha2, alpha3, w0, w1, w2, w3 = solution
-        angles = [alpha0, alpha1, alpha2, alpha3]
-        weights = [w0, w1, w2, w3]
+        base_speed, P, I, D, alpha0, alpha1, w0, w1, Ksr = solution
+        angles = [alpha0, alpha1, -alpha0, -alpha1]
+        weights = [w0, w1, -w0, -w1, Ksr]
 
         rob=MyRob(rob_name, pos, angles, host, 
             base_speed=base_speed,
             P=P,
             I=I,
             D=D,
-            set_point=set_point,
+            set_point=0.0,
             weights=weights,
             in_eval=True)
         
@@ -69,7 +70,7 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def command_sim(command):
-        explorer = {'x':430, 'y':300}
+        explorer = {'x':100, 'y':300}
 
         # reset simulation
         pyautogui.click(x=explorer['x'], y=explorer['y'], clicks=1, button='left')
@@ -87,13 +88,16 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def on_generation(ga):
-        max_fitness = np.max(ga.last_generation_fitness)
-
+        headers = ['base_speed', 'P', 'I', 'D', 'alpha0', 'alpha1', 'w0', 'w1', 'Ksr']
+        sol, fit, idx = ga.best_solution(pop_fitness=ga.last_generation_fitness)
+        
         logger.info(f'Generation: {ga.generations_completed} of {ga.num_generations}')
-        for idx in np.where(ga.last_generation_fitness == max_fitness):
-            logger.info(f'Best solution({idx}): {ga.population[idx]}')
-        logger.info(f'Best fitness: {max_fitness}')
-        logger.info('='*20)
+        logger.info(f'Best fitness {fit} [{idx}]')
+        logger.info(f'Mean fitness: {np.mean(ga.last_generation_fitness)}')
+        
+        print()
+        print(tabulate([sol], headers=headers))
+        print('='*50)
         
     @staticmethod
     def on_start(ga):
@@ -155,34 +159,26 @@ if __name__ == '__main__':
     configLogger()
     pyautogui.PAUSE = 0.1
 
-    gene_space = [{'low': 0,'high': 2}, # linear speed
+    gene_space = [{'low': 0,'high': 5}, # linear speed
                     None, # P
                     None, # I
                     None, # D
-                    None, # set-point
-                    {'low': -180,'high': 180}, # alpha0
-                    {'low': -180,'high': 180}, # alpha1
-                    {'low': -180,'high': 180}, # alpha2
-                    {'low': -180,'high': 180}, # alpha3
-                    {'low': -1, 'high': 1}, # weight0
-                    {'low': -1, 'high': 1}, # weight1
-                    {'low': -1, 'high': 1}, # weight2
-                    {'low': -1, 'high': 1} # weight3
+                    {'low': 0,'high': 180}, # alpha0
+                    {'low': 0,'high': 180}, # alpha1
+                    {'low': 0, 'high': 1}, # weight0
+                    {'low': 0, 'high': 1}, # weight1
+                    {'low': 0, 'high': 1} # Ksr
                     ] 
 
     gene_type = [[float, 6], # linear speed
                 [float, 6], # P
                 [float, 6], # I
                 [float, 6], # D
-                [float, 6], # set-point
                 int, # alpha0
                 int, # alpha1
-                int, # alpha2
-                int, # alpha4
                 [float, 6], # weight0
                 [float, 6], # weight1
-                [float, 6], # weight2
-                [float, 6] # weight3
+                [float, 6] # Ksr
                 ]
 
     if len(gene_space) != len(gene_type):
@@ -210,7 +206,7 @@ if __name__ == '__main__':
                        on_generation=PooledGA.on_generation,
                        on_fitness=PooledGA.on_fitness, 
                        on_stop=PooledGA.on_stop,
-                       mutation_probability=0.4,
+                       mutation_probability=0.15,
                        parent_selection_type="sus",
                        crossover_type="uniform",
                        mutation_type="random",

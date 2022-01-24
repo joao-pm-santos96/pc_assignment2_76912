@@ -119,7 +119,7 @@ class MyRob(CRobLinkAngs):
                 I=0, 
                 D=0, 
                 set_point=0.0,
-                weight=0.5,
+                weights=[1.0]*NUM_IR_SENSORS,
                 in_eval= False):
 
         CRobLinkAngs.__init__(self, rob_name, rob_id, angles, host)
@@ -130,8 +130,10 @@ class MyRob(CRobLinkAngs):
         self.I = I
         self.D = D
         self.set_point = set_point
-        self.weight = weight
+        self.weights = weights #w0, w1, w2, w3 and Ksr
         self.in_eval = in_eval
+
+        self.past_errors = np.zeros(3)
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -157,7 +159,7 @@ class MyRob(CRobLinkAngs):
         stopped_state = 'run'
 
         # initialize PID
-        self.pid = PID.PID(self.P, self.I, self.D)
+        self.pid = PID(self.P, self.I, self.D)
         self.pid.SetPoint = self.set_point
         self.pid.setSampleTime(self.sample_time)
 
@@ -195,9 +197,11 @@ class MyRob(CRobLinkAngs):
                 return
 
             # PID
-            delta1 = (self.measures.irSensor[2] - self.measures.irSensor[0])
-            delta2 = (self.measures.irSensor[3] - self.measures.irSensor[1])
-            self.pid.update(self.weight*delta1 + (1-self.weight)*delta2)
+            mv = np.sum(np.multiply(self.weights[:4], self.measures.irSensor))
+            self.pid.update(mv)
+
+            self.past_errors = np.roll(self.past_errors, -1)
+            self.past_errors[-1] = self.pid.last_error
             
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
@@ -232,33 +236,11 @@ class MyRob(CRobLinkAngs):
 
 
     def wander(self):
-        # center_id = 0
-        # left_id = 1
-        # right_id = 2
-        # back_id = 3
 
         coefficients = np.array([[1, 1], [1, -1]])
         results = np.array([2 * self.base_speed, self.pid.output])
-        v_right, v_left = np.linalg.solve(coefficients, results)
-
+        v_right, v_left = np.linalg.solve(coefficients, results) - np.sum(np.abs(self.past_errors)) * self.weights[-1]
         self.driveMotors(v_left, v_right)
-
-
-        # if    self.measures.irSensor[center_id] > 5.0\
-        #    or self.measures.irSensor[left_id]   > 5.0\
-        #    or self.measures.irSensor[right_id]  > 5.0\
-        #    or self.measures.irSensor[back_id]   > 5.0:
-        #     print('Rotate left')
-        #     self.driveMotors(-0.1,+0.1)
-        # elif self.measures.irSensor[left_id]> 2.7:
-        #     print('Rotate slowly right')
-        #     self.driveMotors(0.1,0.0)
-        # elif self.measures.irSensor[right_id]> 2.7:
-        #     print('Rotate slowly left')
-        #     self.driveMotors(0.0,0.1)
-        # else:
-        #     print('Go')
-        #     self.driveMotors(0.1,0.1)
 
     """
     JS METHODS
@@ -316,29 +298,29 @@ for i in range(1, len(sys.argv),2):
         quit()
 
 if __name__ == '__main__':
+    pass
+    # base_speed, P, I, D, angle0, angle1, weight = [2.367360000000000020e-01,
+    #                                             -1.053395000000000081e+00,
+    #                                             -2.422829999999999984e-01,
+    #                                             1.160000000000000007e-04,
+    #                                             8.000000000000000000e+00,
+    #                                             4.900000000000000000e+01,
+    #                                             5.674900000000000500e-01]
 
-    base_speed, P, I, D, angle0, angle1, weight = [2.367360000000000020e-01,
-                                                -1.053395000000000081e+00,
-                                                -2.422829999999999984e-01,
-                                                1.160000000000000007e-04,
-                                                8.000000000000000000e+00,
-                                                4.900000000000000000e+01,
-                                                5.674900000000000500e-01]
+    # angles = [angle0, angle1, -angle0, -angle1]
 
-    angles = [angle0, angle1, -angle0, -angle1]
+    # rob=MyRob(rob_name, pos, angles, host,
+    #     base_speed=base_speed,
+    #     P=P,
+    #     I=I,
+    #     D=D,
+    #     weight=weight)
 
-    rob=MyRob(rob_name, pos, angles, host,
-        base_speed=base_speed,
-        P=P,
-        I=I,
-        D=D,
-        weight=weight)
-
-    if mapc != None:
-        rob.setMap(mapc.labMap)
-        rob.printMap()
+    # if mapc != None:
+    #     rob.setMap(mapc.labMap)
+    #     rob.printMap()
 
 
-    rob.run()
+    # rob.run()
 
 
