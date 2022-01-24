@@ -159,7 +159,7 @@ if __name__ == '__main__':
     configLogger()
     pyautogui.PAUSE = 0.1
 
-    gene_space = [{'low': 0,'high': 5}, # linear speed
+    gene_space = [{'low': 0,'high': 1}, # linear speed
                     None, # P
                     None, # I
                     None, # D
@@ -167,7 +167,7 @@ if __name__ == '__main__':
                     {'low': 0,'high': 180}, # alpha1
                     {'low': 0, 'high': 1}, # weight0
                     {'low': 0, 'high': 1}, # weight1
-                    {'low': 0, 'high': 1} # Ksr
+                    None # Ksr
                     ] 
 
     gene_type = [[float, 6], # linear speed
