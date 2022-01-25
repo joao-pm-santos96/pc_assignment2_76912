@@ -119,6 +119,7 @@ class MyRob(CRobLinkAngs):
                 I=0, 
                 D=0, 
                 set_point=0.0,
+                windup=20.0,
                 weights=[1.0]*NUM_IR_SENSORS,
                 in_eval= False):
 
@@ -130,6 +131,7 @@ class MyRob(CRobLinkAngs):
         self.I = I
         self.D = D
         self.set_point = set_point
+        self.windup = windup
         self.weights = weights #w0, w1, w2, w3 and Ksr
         self.in_eval = in_eval
 
@@ -162,6 +164,7 @@ class MyRob(CRobLinkAngs):
         self.pid = PID(self.P, self.I, self.D)
         self.pid.SetPoint = self.set_point
         self.pid.setSampleTime(self.sample_time)
+        self.pid.setWindup(self.windup)
 
         # localization
         last_ground = -1
