@@ -165,12 +165,12 @@ if __name__ == '__main__':
                     None, # I
                     None, # D
                     {'low': 0,'high': 50}, # windup (must be positive)
-                    {'low': 0,'high': 90}, # alpha0
-                    {'low': 0,'high': 90}, # alpha1
+                    {'low': 0,'high': 180}, # alpha0
+                    {'low': 0,'high': 180}, # alpha1
                     None, # weight0
                     None, # weight1
                     [0], # set-point
-                    [0], # Ksr (must be positive)
+                    None, # Ksr (must be positive)
                     ] 
 
     gene_type = [[float, 6], # linear speed
@@ -212,7 +212,7 @@ if __name__ == '__main__':
                        on_fitness=PooledGA.on_fitness, 
                        on_stop=PooledGA.on_stop,
                        mutation_probability=0.15,
-                       parent_selection_type="sus",
+                       parent_selection_type="sss",
                        crossover_type="uniform",
                        mutation_type="random",
                        allow_duplicate_genes=True,
