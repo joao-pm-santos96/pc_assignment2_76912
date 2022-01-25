@@ -241,8 +241,9 @@ class MyRob(CRobLinkAngs):
     def wander(self):
 
         coefficients = np.array([[1, 1], [1, -1]])
-        results = np.array([2 * self.base_speed, self.pid.output])
-        v_right, v_left = np.linalg.solve(coefficients, results) - np.sum(np.abs(self.past_errors)) * self.weights[-1]
+        deduction = np.sum(np.abs(self.past_errors)) * self.weights[-1]
+        results = np.array([2 * self.base_speed, self.pid.output]) - deduction
+        v_right, v_left = np.linalg.solve(coefficients, results)
         self.driveMotors(v_left, v_right)
 
     """
