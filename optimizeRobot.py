@@ -47,7 +47,7 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        base_speed, P, I, D, windup, alpha0, alpha1, w0, w1, Ksr = solution
+        base_speed, P, I, D, windup, alpha0, alpha1, w0, w1, setpoint, Ksr = solution
         angles = [alpha0, alpha1, -alpha0, -alpha1]
         weights = [w0, w1, -w0, -w1, Ksr]
 
@@ -56,7 +56,7 @@ class PooledGA(pygad.GA):
             P=P,
             I=I,
             D=D,
-            set_point=0.0,
+            set_point=setpoint,
             windup=windup,
             weights=weights,
             in_eval=True)
@@ -89,7 +89,7 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def on_generation(ga):
-        headers = ['base_speed', 'P', 'I', 'D', 'windup', 'alpha0', 'alpha1', 'w0', 'w1', 'Ksr']
+        headers = ['base_speed', 'P', 'I', 'D', 'windup', 'alpha0', 'alpha1', 'w0', 'w1', 'SP', 'Ksr']
         sol, fit, idx = ga.best_solution(pop_fitness=ga.last_generation_fitness)
         
         logger.info(f'Generation: {ga.generations_completed} of {ga.num_generations}')
@@ -165,11 +165,12 @@ if __name__ == '__main__':
                     None, # I
                     None, # D
                     {'low': 0,'high': 50}, # windup (must be positive)
-                    {'low': 0,'high': 180}, # alpha0
-                    {'low': 0,'high': 180}, # alpha1
+                    {'low': 0,'high': 90}, # alpha0
+                    {'low': 0,'high': 90}, # alpha1
                     None, # weight0
                     None, # weight1
-                    {'low': 0,'high': 10}, # Ksr (must be positive)
+                    [0], # set-point
+                    [0], # Ksr (must be positive)
                     ] 
 
     gene_type = [[float, 6], # linear speed
@@ -181,6 +182,7 @@ if __name__ == '__main__':
                 int, # alpha1
                 [float, 6], # weight0
                 [float, 6], # weight1
+                [float, 6], # set-point
                 [float, 6] # Ksr
                 ]
 
