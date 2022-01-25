@@ -188,7 +188,7 @@ if __name__ == '__main__':
         raise Exception('== GENE SPACE and GENE TYPE have different lengths ==')
 
     num_genes = len(gene_space)
-    num_generations = 1000
+    num_generations = 500
     sol_per_pop = 100
     num_parents_mating = 25
 
