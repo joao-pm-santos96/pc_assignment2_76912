@@ -135,7 +135,7 @@ class MyRob(CRobLinkAngs):
         self.weights = weights #w0, w1, w2, w3 and Ksr
         self.in_eval = in_eval
 
-        self.past_errors = np.zeros(3)
+        self.memory = np.zeros(3)
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -202,9 +202,6 @@ class MyRob(CRobLinkAngs):
             # PID
             mv = np.sum(np.multiply(self.weights[:4], self.measures.irSensor))
             self.pid.update(mv)
-
-            self.past_errors = np.roll(self.past_errors, -1)
-            self.past_errors[-1] = self.pid.last_error
             
             if self.measures.endLed:
                 print(self.rob_name + " exiting")
@@ -239,11 +236,14 @@ class MyRob(CRobLinkAngs):
 
 
     def wander(self):
+        
+        self.memory = np.roll(self.memory, -1)
+        self.memory[-1] = self.pid.output
+        deduction = np.mean(np.abs(self.memory)) * self.weights[-1]
 
         coefficients = np.array([[1, 1], [1, -1]])
-        deduction = np.sum(np.abs(self.past_errors)) * self.weights[-1]
-        results = np.array([2 * self.base_speed, self.pid.output]) - deduction
-        v_right, v_left = np.linalg.solve(coefficients, results)
+        results = np.array([2 * self.base_speed, self.pid.output])
+        v_right, v_left = np.linalg.solve(coefficients, results) + deduction
         self.driveMotors(v_left, v_right)
 
     """
