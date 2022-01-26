@@ -166,7 +166,7 @@ if __name__ == '__main__':
                     None, # D
                     {'low': 0,'high': 50}, # windup (must be positive)
                     {'low': 0,'high': 180}, # alpha0
-                    [90], # alpha1
+                    {'low': 0,'high': 180}, # alpha1
                     None, # weight0
                     None, # weight1
                     [0], # set-point
