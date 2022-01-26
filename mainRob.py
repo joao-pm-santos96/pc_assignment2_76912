@@ -135,7 +135,7 @@ class MyRob(CRobLinkAngs):
         self.weights = weights #w0, w1, w2, w3 and Ksr
         self.in_eval = in_eval
 
-        self.memory = np.zeros(3)
+        self.memory = np.zeros(1)
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
@@ -302,29 +302,36 @@ for i in range(1, len(sys.argv),2):
         quit()
 
 if __name__ == '__main__':
-    pass
-    # base_speed, P, I, D, angle0, angle1, weight = [2.367360000000000020e-01,
-    #                                             -1.053395000000000081e+00,
-    #                                             -2.422829999999999984e-01,
-    #                                             1.160000000000000007e-04,
-    #                                             8.000000000000000000e+00,
-    #                                             4.900000000000000000e+01,
-    #                                             5.674900000000000500e-01]
 
-    # angles = [angle0, angle1, -angle0, -angle1]
+    solution = [1.860259999999999969e-01,
+            -1.906900999999999957e+00,
+            -4.585700000000000193e-02,
+            -1.839599999999999916e-02,
+            2.014861000000000146e+01,
+            3.700000000000000000e+01,
+            3.000000000000000000e+01,
+            -1.459050000000000069e-01,
+            -1.448160000000000003e-01,
+            0.000000000000000000e+00,
+            0.000000000000000000e+00]
+    
+    base_speed, P, I, D, windup, alpha0, alpha1, w0, w1, setpoint, Ksr = solution
+    angles = [alpha0, alpha1, -alpha0, -alpha1]
+    weights = [w0, w1, -w0, -w1, Ksr]
 
-    # rob=MyRob(rob_name, pos, angles, host,
-    #     base_speed=base_speed,
-    #     P=P,
-    #     I=I,
-    #     D=D,
-    #     weight=weight)
+    rob=MyRob(rob_name, pos, angles, host, 
+            base_speed=base_speed,
+            P=P,
+            I=I,
+            D=D,
+            set_point=setpoint,
+            windup=windup,
+            weights=weights)
 
-    # if mapc != None:
-    #     rob.setMap(mapc.labMap)
-    #     rob.printMap()
+    if mapc != None:
+        rob.setMap(mapc.labMap)
+        rob.printMap()
 
-
-    # rob.run()
+    rob.run()
 
 
