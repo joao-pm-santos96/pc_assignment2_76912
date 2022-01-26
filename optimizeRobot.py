@@ -170,7 +170,7 @@ if __name__ == '__main__':
                     None, # weight0
                     None, # weight1
                     [0], # set-point
-                    None, # Ksr (must be positive)
+                    [0], # Ksr (must be positive)
                     ] 
 
     gene_type = [[float, 6], # linear speed
