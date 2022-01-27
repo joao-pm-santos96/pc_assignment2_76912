@@ -47,9 +47,9 @@ class PooledGA(pygad.GA):
         pos = int(index)
 
         # setup agent
-        base_speed, P, I, D, windup, alpha0, alpha1, w0 = solution
+        base_speed, P, I, D, windup, alpha0, alpha1, w0, w1, ksr, mem_size = solution
         angles = [alpha0, alpha1, -alpha0, -alpha1]
-        weights = [w0, (1-w0), -w0, -(1-w0), 0]
+        weights = [w0, w1, -w0, -w1, ksr]
 
         rob=MyRob(rob_name, pos, angles, host, 
             base_speed=base_speed,
@@ -59,6 +59,7 @@ class PooledGA(pygad.GA):
             set_point=0,
             windup=windup,
             weights=weights,
+            mem_size=mem_size,
             in_eval=True)
         
         rob.run()
@@ -167,7 +168,10 @@ if __name__ == '__main__':
                     {'low': 0,'high': 50}, # windup (must be positive)
                     {'low': 0,'high': 180}, # alpha0
                     {'low': 0,'high': 180}, # alpha1
-                    {'low': 0,'high': 1} # weight0
+                    None, # weight0
+                    None, # weight1
+                    None, # Ksr,
+                    [1,2,3] # Mem Size
                     ] 
 
     gene_type = [[float, 6], # linear speed
@@ -178,6 +182,9 @@ if __name__ == '__main__':
                 int, # alpha0
                 int, # alpha1
                 [float, 6], # weight0
+                [float, 6], # weight1
+                [float, 6], # Ksr
+                int # Mem Size
                 ]
 
     if len(gene_space) != len(gene_type):
