@@ -120,7 +120,7 @@ class MyRob(CRobLinkAngs):
                 D=0, 
                 set_point=0.0,
                 windup=20.0,
-                weights=[1.0]*NUM_IR_SENSORS,
+                weights=[1.0]*NUM_IR_SENSORS+[0],
                 in_eval= False):
 
         CRobLinkAngs.__init__(self, rob_name, rob_id, angles, host)
