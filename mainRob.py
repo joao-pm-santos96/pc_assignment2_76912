@@ -304,18 +304,28 @@ for i in range(1, len(sys.argv),2):
 
 if __name__ == '__main__':
 
-    solution = [.880048, -1.78629, 0.001976, -0.375373, 22.163, 52, 90, -0.435247, -0.296408, 0,  0]
+    solution = [1.890689999999999871e-01,
+7.740097999999999701e+00,
+6.810159999999999547e-01,
+-7.488999999999999997e-03,
+1.259777399999999936e+01,
+3.600000000000000000e+01,
+4.200000000000000000e+01,
+8.517879999999999896e-01,
+7.584720000000000351e-01,
+4.809729999999999839e-01,
+1.000000000000000000e+00]
     
-    base_speed, P, I, D, windup, alpha0, alpha1, w0, w1, setpoint, Ksr = solution
+    base_speed, P, I, D, windup, alpha0, alpha1, w0, w1, ksr, mem_size = solution
     angles = [alpha0, alpha1, -alpha0, -alpha1]
-    weights = [w0, w1, -w0, -w1, Ksr]
+    weights = [w0, w1, -w0, -w1, ksr]
 
     rob=MyRob(rob_name, pos, angles, host, 
             base_speed=base_speed,
             P=P,
             I=I,
             D=D,
-            set_point=setpoint,
+            set_point=0,
             windup=windup,
             weights=weights)
 
