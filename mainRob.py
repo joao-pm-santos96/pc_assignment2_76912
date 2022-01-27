@@ -121,6 +121,7 @@ class MyRob(CRobLinkAngs):
                 set_point=0.0,
                 windup=20.0,
                 weights=[1.0]*NUM_IR_SENSORS+[0],
+                mem_size = 1,
                 in_eval= False):
 
         CRobLinkAngs.__init__(self, rob_name, rob_id, angles, host)
@@ -135,7 +136,7 @@ class MyRob(CRobLinkAngs):
         self.weights = weights #w0, w1, w2, w3 and Ksr
         self.in_eval = in_eval
 
-        self.memory = np.zeros(1)
+        self.memory = np.zeros(mem_size)
 
     # In this map the center of cell (i,j), (i in 0..6, j in 0..13) is mapped to labMap[i*2][j*2].
     # to know if there is a wall on top of cell(i,j) (i in 0..5), check if the value of labMap[i*2+1][j*2] is space or not
