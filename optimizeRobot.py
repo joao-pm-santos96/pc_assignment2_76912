@@ -90,7 +90,7 @@ class PooledGA(pygad.GA):
 
     @staticmethod
     def on_generation(ga):
-        headers = ['base_speed', 'P', 'I', 'D', 'windup', 'alpha0', 'alpha1', 'w0', 'w1', 'SP', 'Ksr']
+        headers = ['base_speed', 'P', 'I', 'D', 'windup', 'alpha0', 'alpha1', 'w0', 'w1', 'ksr', 'mem_size']
         sol, fit, idx = ga.best_solution(pop_fitness=ga.last_generation_fitness)
         
         logger.info(f'Generation: {ga.generations_completed} of {ga.num_generations}')
